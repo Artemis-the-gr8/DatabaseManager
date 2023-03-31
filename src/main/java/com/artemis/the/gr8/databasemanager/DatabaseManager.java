@@ -9,54 +9,26 @@ import java.util.List;
 
 public class DatabaseManager {
 
-    private static volatile DatabaseManager instance;
-    private Database database;
-
-    public static void main(String[] args) {
-        getSQLiteManager(new File(System.getProperty("user.dir")));
-    }
-
-    private DatabaseManager(String URL) {
-        this(URL, null, null);
-    }
+    //local MySQL URL for testing: jdbc:mysql://localhost:3306/minecraftstatdb
+    private final Database database;
 
     private DatabaseManager(String URL, String username, String password) {
         database = new Database(URL, username, password);
     }
 
     public static DatabaseManager getMySQLManager(String URL, String username, String password) {
-        DatabaseManager localVar = instance;
-        if (localVar != null) {
-            return localVar;
-        }
-
-        synchronized (DatabaseManager.class) {
-            if (instance == null) {
-                instance = new DatabaseManager("jdbc:mysql://localhost:3306/minecraftstatdb", "myuser", "myuser");
-            }
-            return instance;
-        }
+        return new DatabaseManager(URL, username, password);
     }
 
     public static DatabaseManager getSQLiteManager(File pluginDataFolder) {
-        DatabaseManager localVar = instance;
-        if (localVar != null) {
-            return localVar;
-        }
-
-        synchronized (DatabaseManager.class) {
-            if (instance == null) {
-                String URL = "jdbc:sqlite:" +
-                        pluginDataFolder.getPath() +
-                        "/stats.db";
-                instance = new DatabaseManager(URL);
-            }
-            return instance;
-        }
+        String URL = "jdbc:sqlite:" +
+                pluginDataFolder.getPath() +
+                "/stats.db";
+        return new DatabaseManager(URL, null, null);
     }
 
     public void setUp(List<MyStatistic> statistics, List<MySubStatistic> subStatistics) {
-        database.fillStatistics(statistics, subStatistics);
+        database.updateStatistics(statistics, subStatistics);
     }
 
     public void updateAllTables(List<MyPlayer> players, List<MyStatistic> statistics, List<MySubStatistic> subStatistics) {

@@ -1,11 +1,13 @@
 package com.artemis.the.gr8.databasemanager;
 
+import com.artemis.the.gr8.databasemanager.models.MyStatType;
 import com.artemis.the.gr8.databasemanager.models.MyStatistic;
 import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Database {
@@ -14,41 +16,51 @@ public class Database {
     private final String USER;
     private final String PASSWORD;
 
-    private Connection connection;
-
     public Database(String URL, String username, String password) {
         this.URL = URL;
         this.USER = username;
         this.PASSWORD = password;
-        setup();
+
+        createTablesIfNotExisting();
     }
 
-    private void setup() {
-        try {
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            createTablesIfNotExisting();
-            connection.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void fillStatistics(List<MyStatistic> statistics, List<MySubStatistic> subStatistics) {
-        try {
-            if (connection == null || connection.isClosed()) {
-                connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            }
-            fillStatTable(statistics);
-            connection.close();
+    public void updateStatistics(List<MyStatistic> statistics, List<MySubStatistic> subStatistics) {
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)){
+            updateStatTable(statistics, connection);
+            updateSubStatTable(subStatistics, connection);
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private void fillStatTable(List<MyStatistic> statistics) {
-        try {
-            PreparedStatement statement = connection.prepareStatement(Query.INSERT_STATISTIC);
+    private void updateStatTable(List<MyStatistic> statistics, Connection connection) {
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(Query.SELECT_ALL_FROM_STAT_TABLE);
+            List<MyStatistic> newStatistics = filterOutAlreadyExistingStatistics(statistics, resultSet);
+            resultSet.close();
+
+            insertIntoStatTable(newStatistics, connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private @NotNull List<MyStatistic> filterOutAlreadyExistingStatistics(List<MyStatistic> providedStatistics, @NotNull ResultSet storedStatistics) throws SQLException {
+        ArrayList<MyStatistic> newStatistics = new ArrayList<>(providedStatistics);
+        while (storedStatistics.next()) {
+            MyStatistic currentRow = new MyStatistic(
+                    storedStatistics.getString("statName"),
+                    MyStatType.fromString(storedStatistics.getString("statType")));
+
+            newStatistics.remove(currentRow);
+        }
+        return newStatistics;
+    }
+
+    private void insertIntoStatTable(@NotNull List<MyStatistic> statistics, @NotNull Connection connection) {
+        try (PreparedStatement statement = connection.prepareStatement(Query.INSERT_STATISTIC)){
             statistics.forEach(stat ->
             {
                 try {
@@ -61,21 +73,26 @@ public class Database {
                 }
             });
             statement.executeBatch();
-            statement.close();
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    private void updateSubStatTable(List<MySubStatistic> subStatistics, Connection connection) {
+
+    }
+
     private void createTablesIfNotExisting() {
-        try (Statement statement = connection.createStatement()){
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)){
+            Statement statement = connection.createStatement();
             statement.addBatch(createPlayerTable());
             statement.addBatch(createStatTable());
             statement.addBatch(createSubStatTable());
             statement.addBatch(createStatCombinationTable());
             statement.addBatch(createStatValueTable());
             statement.executeBatch();
+            statement.close();
         }
         catch (SQLException e) {
             e.printStackTrace();
