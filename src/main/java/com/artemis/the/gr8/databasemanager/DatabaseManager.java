@@ -1,8 +1,10 @@
 package com.artemis.the.gr8.databasemanager;
 
-import com.artemis.the.gr8.databasemanager.models.MyPlayer;
-import com.artemis.the.gr8.databasemanager.models.MyStatistic;
-import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
+import com.artemis.the.gr8.databasemanager.datamodels.MyPlayer;
+import com.artemis.the.gr8.databasemanager.datamodels.MyStatistic;
+import com.artemis.the.gr8.databasemanager.datamodels.MySubStatistic;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
@@ -16,11 +18,12 @@ public class DatabaseManager {
         database = new Database(URL, username, password);
     }
 
-    public static DatabaseManager getMySQLManager(String URL, String username, String password) {
+    @Contract("_, _, _ -> new")
+    public static @NotNull DatabaseManager getMySQLManager(String URL, String username, String password) {
         return new DatabaseManager(URL, username, password);
     }
 
-    public static DatabaseManager getSQLiteManager(File pluginDataFolder) {
+    public static @NotNull DatabaseManager getSQLiteManager(@NotNull File pluginDataFolder) {
         String URL = "jdbc:sqlite:" +
                 pluginDataFolder.getPath() +
                 "/stats.db";
@@ -44,6 +47,10 @@ public class DatabaseManager {
     }
 
     public void updateSubStatTable(List<MySubStatistic> subStatistics) {
+
+    }
+
+    private void setup() {
 
     }
 }
