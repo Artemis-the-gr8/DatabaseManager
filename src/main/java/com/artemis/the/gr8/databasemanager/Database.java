@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class Database {
 
@@ -20,14 +21,16 @@ public class Database {
         this.URL = URL;
         this.USER = username;
         this.PASSWORD = password;
+    }
 
+    public void setUp() {
         createTablesIfNotExisting();
     }
 
     public void updateStatistics(List<MyStatistic> statistics, List<MySubStatistic> subStatistics) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)){
-            updateSubStatTable(subStatistics, connection);
-            updateStatTable(statistics, connection);
+            List<MyStatistic> newStats = updateStatTable(statistics, connection);
+            List<MySubStatistic> newSubStats = updateSubStatTable(subStatistics, connection);
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -42,6 +45,8 @@ public class Database {
                 List<MySubStatistic> newSubStatistics = filterOutExistingSubStatistics(subStatistics, resultSet);
                 resultSet.close();
 
+                insertIntoSubStatTable(newSubStatistics, connection);
+                return newSubStatistics;
             }
             catch (SQLException e) {
                 e.printStackTrace();
@@ -91,9 +96,14 @@ public class Database {
         return newStatistics;
     }
 
-    private void insertIntoSubStatTable(List<MySubStatistic> subStats, Connection connection) {
+    private void insertIntoSubStatTable(@NotNull List<MySubStatistic> subStats, @NotNull Connection connection) {
         try (PreparedStatement statement = connection.prepareStatement(Query.INSERT_SUB_STATISTIC)) {
-
+            for (MySubStatistic subStat : subStats) {
+                statement.setString(1, subStat.subStatName());
+                statement.setString(2, subStat.subStatType().toString().toUpperCase(Locale.ENGLISH));
+                statement.addBatch();
+            }
+            statement.executeBatch();
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -104,7 +114,7 @@ public class Database {
         try (PreparedStatement statement = connection.prepareStatement(Query.INSERT_STATISTIC)){
             for (MyStatistic stat : statistics) {
                 statement.setString(1, stat.statName());
-                statement.setString(2, stat.statType().toString());
+                statement.setString(2, stat.statType().toString().toUpperCase(Locale.ENGLISH));
                 statement.addBatch();
             }
             statement.executeBatch();
