@@ -17,7 +17,10 @@
 DROP TABLE IF EXISTS statcombinations;
 DROP TABLE IF EXISTS statistics;
 DROP TABLE IF EXISTS substatistics;
-DROP TABLE IF EXISTS players;]]></console>
+DROP TABLE IF EXISTS players;
+
+SELECT * FROM statistics;
+SELECT * FROM substatistics;]]></console>
     </connection>
     <connection id="0d9d0ee1-4f30-4b7f-9c8f-5f5b15bc443e">
       <console name="SQLite" type="STANDARD" schema="main" session="Main"><![CDATA[select * from players;

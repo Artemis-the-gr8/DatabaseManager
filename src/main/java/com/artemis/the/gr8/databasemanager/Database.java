@@ -6,6 +6,7 @@ import com.artemis.the.gr8.databasemanager.datamodels.MySubStatistic;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,23 @@ public class Database {
         }
     }
 
+    private @NotNull List<MyStatistic> updateStatTable(List<MyStatistic> statistics, Connection connection) {
+        if (statistics != null) {
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resultSet = statement.executeQuery(Query.SELECT_ALL_FROM_STAT_TABLE);
+                List<MyStatistic> newStatistics = filterOutExistingStatistics(statistics, resultSet);
+                resultSet.close();
+
+                insertIntoStatTable(newStatistics, connection);
+                return newStatistics;
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ArrayList<>();
+    }
+
     @Contract("null, _ -> new")
     private @NotNull List<MySubStatistic> updateSubStatTable(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
         if (subStatistics != null) {
@@ -55,21 +73,16 @@ public class Database {
         return new ArrayList<>();
     }
 
-    private @NotNull List<MyStatistic> updateStatTable(List<MyStatistic> statistics, Connection connection) {
-        if (statistics != null) {
-            try (Statement statement = connection.createStatement()) {
-                ResultSet resultSet = statement.executeQuery(Query.SELECT_ALL_FROM_STAT_TABLE);
-                List<MyStatistic> newStatistics = filterOutExistingStatistics(statistics, resultSet);
-                resultSet.close();
+    private @NotNull List<MyStatistic> filterOutExistingStatistics(List<MyStatistic> providedStatistics, @NotNull ResultSet storedStatistics) throws SQLException {
+        ArrayList<MyStatistic> newStatistics = new ArrayList<>(providedStatistics);
+        while (storedStatistics.next()) {
+            MyStatistic currentRow = new MyStatistic(
+                    storedStatistics.getString("statName"),
+                    MyStatType.fromString(storedStatistics.getString("statType")));
 
-                insertIntoStatTable(newStatistics, connection);
-                return newStatistics;
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
-            }
+            newStatistics.remove(currentRow);
         }
-        return new ArrayList<>();
+        return newStatistics;
     }
 
     private @NotNull List<MySubStatistic> filterOutExistingSubStatistics(List<MySubStatistic> providedSubStats, @NotNull ResultSet storedSubStats) throws SQLException {
@@ -84,23 +97,11 @@ public class Database {
         return newSubStatistics;
     }
 
-    private @NotNull List<MyStatistic> filterOutExistingStatistics(List<MyStatistic> providedStatistics, @NotNull ResultSet storedStatistics) throws SQLException {
-        ArrayList<MyStatistic> newStatistics = new ArrayList<>(providedStatistics);
-        while (storedStatistics.next()) {
-            MyStatistic currentRow = new MyStatistic(
-                    storedStatistics.getString("statName"),
-                    MyStatType.fromString(storedStatistics.getString("statType")));
-
-            newStatistics.remove(currentRow);
-        }
-        return newStatistics;
-    }
-
-    private void insertIntoSubStatTable(@NotNull List<MySubStatistic> subStats, @NotNull Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(Query.INSERT_SUB_STATISTIC)) {
-            for (MySubStatistic subStat : subStats) {
-                statement.setString(1, subStat.subStatName());
-                statement.setString(2, subStat.subStatType().toString().toUpperCase(Locale.ENGLISH));
+    private void insertIntoStatTable(@NotNull List<MyStatistic> statistics, @NotNull Connection connection) {
+        try (PreparedStatement statement = connection.prepareStatement(Query.INSERT_STATISTIC)){
+            for (MyStatistic stat : statistics) {
+                statement.setString(1, stat.statName());
+                statement.setString(2, stat.statType().toString().toUpperCase(Locale.ENGLISH));
                 statement.addBatch();
             }
             statement.executeBatch();
@@ -110,11 +111,11 @@ public class Database {
         }
     }
 
-    private void insertIntoStatTable(@NotNull List<MyStatistic> statistics, @NotNull Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(Query.INSERT_STATISTIC)){
-            for (MyStatistic stat : statistics) {
-                statement.setString(1, stat.statName());
-                statement.setString(2, stat.statType().toString().toUpperCase(Locale.ENGLISH));
+    private void insertIntoSubStatTable(@NotNull List<MySubStatistic> subStats, @NotNull Connection connection) {
+        try (PreparedStatement statement = connection.prepareStatement(Query.INSERT_SUB_STATISTIC)) {
+            for (MySubStatistic subStat : subStats) {
+                statement.setString(1, subStat.subStatName());
+                statement.setString(2, subStat.subStatType().toString().toUpperCase(Locale.ENGLISH));
                 statement.addBatch();
             }
             statement.executeBatch();
