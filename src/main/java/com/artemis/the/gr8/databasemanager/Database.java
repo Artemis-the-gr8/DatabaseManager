@@ -77,8 +77,8 @@ public class Database {
         ArrayList<MyStatistic> newStatistics = new ArrayList<>(providedStatistics);
         while (storedStatistics.next()) {
             MyStatistic currentRow = new MyStatistic(
-                    storedStatistics.getString("statName"),
-                    MyStatType.fromString(storedStatistics.getString("statType")));
+                    storedStatistics.getString("name"),
+                    MyStatType.fromString(storedStatistics.getString("type")));
 
             newStatistics.remove(currentRow);
         }
@@ -89,8 +89,8 @@ public class Database {
         ArrayList<MySubStatistic> newSubStatistics = new ArrayList<>(providedSubStats);
         while (storedSubStats.next()) {
             MySubStatistic currentRow = new MySubStatistic(
-                    storedSubStats.getString("subStatName"),
-                    MyStatType.fromString(storedSubStats.getString("subStatType")));
+                    storedSubStats.getString("name"),
+                    MyStatType.fromString(storedSubStats.getString("type")));
 
             newSubStatistics.remove(currentRow);
         }
