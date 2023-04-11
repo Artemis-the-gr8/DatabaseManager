@@ -1,16 +1,13 @@
 package com.artemis.the.gr8.databasemanager;
 
+import com.artemis.the.gr8.databasemanager.datamodels.Timer;
 import com.artemis.the.gr8.databasemanager.datamodels.MyStatType;
 import com.artemis.the.gr8.databasemanager.datamodels.MyStatistic;
 import com.artemis.the.gr8.databasemanager.datamodels.MySubStatistic;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class Database {
 
@@ -29,34 +26,35 @@ public class Database {
     }
 
     public void updateStatistics(List<MyStatistic> statistics, List<MySubStatistic> subStatistics) {
+        Timer timer = new Timer();
+        timer.startTimer();
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)){
-            List<MyStatistic> newStats = updateStatTable(statistics, connection);
-            List<MySubStatistic> newSubStats = updateSubStatTable(subStatistics, connection);
+            System.out.println("Connection made in " + timer.stopTimer() + "ms");
+
+            timer.startTimer();
+            updateStatTable(statistics, connection);
+            System.out.println("StatTable updated in " + timer.stopTimer() + "ms");
+
+            timer.startTimer();
+            updateSubStatTable(subStatistics, connection);
+            System.out.println("SubStatTable updated in " + timer.stopTimer() + "ms");
+
+
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private @NotNull List<MyStatistic> updateStatTable(List<MyStatistic> statistics, Connection connection) {
+    private void updateStatTable(List<MyStatistic> statistics, Connection connection) {
         if (statistics != null) {
-            try (Statement statement = connection.createStatement()) {
-                ResultSet resultSet = statement.executeQuery(Query.SELECT_ALL_FROM_STAT_TABLE);
-                List<MyStatistic> newStatistics = filterOutExistingStatistics(statistics, resultSet);
-                resultSet.close();
-
-                insertIntoStatTable(newStatistics, connection);
-                return newStatistics;
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
-            }
+            List<MyStatistic> currentlyStored = getAllStatistics(connection);
+            List<MyStatistic> newStatistics = filterOutExistingStats(statistics, currentlyStored);
+            insertIntoStatTable(newStatistics, connection);
         }
-        return new ArrayList<>();
     }
 
-    @Contract("null, _ -> new")
-    private @NotNull List<MySubStatistic> updateSubStatTable(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
+    private void updateSubStatTable(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
         if (subStatistics != null) {
             try (Statement statement = connection.createStatement()) {
                 ResultSet resultSet = statement.executeQuery(Query.SELECT_ALL_FROM_SUB_STAT_TABLE);
@@ -64,25 +62,44 @@ public class Database {
                 resultSet.close();
 
                 insertIntoSubStatTable(newSubStatistics, connection);
-                return newSubStatistics;
             }
             catch (SQLException e) {
                 e.printStackTrace();
             }
         }
-        return new ArrayList<>();
     }
 
-    private @NotNull List<MyStatistic> filterOutExistingStatistics(List<MyStatistic> providedStatistics, @NotNull ResultSet storedStatistics) throws SQLException {
-        ArrayList<MyStatistic> newStatistics = new ArrayList<>(providedStatistics);
-        while (storedStatistics.next()) {
-            MyStatistic currentRow = new MyStatistic(
-                    storedStatistics.getString("name"),
-                    MyStatType.fromString(storedStatistics.getString("type")));
+    private void updateStatCombinationTable(Connection connection) {
 
-            newStatistics.remove(currentRow);
+
+    }
+
+    private @NotNull List<MyStatistic> getAllStatistics(@NotNull Connection connection) {
+        ArrayList<MyStatistic> allStats = new ArrayList<>();
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(Query.SELECT_ALL_FROM_STAT_TABLE);
+
+            while (resultSet.next()) {
+                allStats.add(
+                        new MyStatistic(
+                                resultSet.getString("name"),
+                                MyStatType.fromString(resultSet.getString("type"))));
+            }
+            resultSet.close();
         }
-        return newStatistics;
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return allStats;
+    }
+
+    private Map<Integer, Integer> findAllCombinations(@NotNull Connection connection) throws SQLException {
+        return null;
+    }
+
+    protected @NotNull List<MyStatistic> filterOutExistingStats(@NotNull List<MyStatistic> providedStats, @NotNull List<MyStatistic> storedStats) {
+        storedStats.forEach(providedStats::remove);
+        return providedStats;
     }
 
     private @NotNull List<MySubStatistic> filterOutExistingSubStatistics(List<MySubStatistic> providedSubStats, @NotNull ResultSet storedSubStats) throws SQLException {
@@ -96,6 +113,7 @@ public class Database {
         }
         return newSubStatistics;
     }
+
 
     private void insertIntoStatTable(@NotNull List<MyStatistic> statistics, @NotNull Connection connection) {
         try (PreparedStatement statement = connection.prepareStatement(Query.INSERT_STATISTIC)){

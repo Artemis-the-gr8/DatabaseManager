@@ -45,7 +45,8 @@ public class Query {
             statisticID INT,
             subStatisticID INT,
             FOREIGN KEY (subStatisticID) REFERENCES substatistics(ID),
-            FOREIGN KEY (statisticID) REFERENCES statistics(ID));
+            FOREIGN KEY (statisticID) REFERENCES statistics(ID),
+            CONSTRAINT unique_combination UNIQUE (statisticID, subStatisticID));
             """;
 
     public static final String CREATE_STAT_VALUE_TABLE =
@@ -58,16 +59,6 @@ public class Query {
             FOREIGN KEY (statCombinationID) REFERENCES statcombinations(ID));
             """;
 
-    public static final String SELECT_ALL_FROM_STAT_TABLE =
-            "SELECT * FROM " + statTable + ";";
-
-    public static final String SELECT_ALL_FROM_SUB_STAT_TABLE =
-            "SELECT * FROM " + subStatTable + ";";
-
-    public static final String SELECT_PLAYER_BY_UUID =
-            "SELECT * FROM " + playerTable +
-                    " WHERE UUID = ?;";
-
     public static final String INSERT_STATISTIC =
             "INSERT INTO " + statTable +
                     " (name, type) VALUES (?, ?);";
@@ -76,9 +67,36 @@ public class Query {
             "INSERT INTO " + subStatTable +
                     " (name, type) VALUES (?, ?);";
 
-    public static final String INSERT_NEW_PLAYER =
+    public static final String INSERT_ALL_STATS_AND_SUB_STATS_INTO_COMBINED_TABLE =
+            """
+            INSERT INTO statcombinations (statisticID, subStatisticID)
+            SELECT statistics.ID, substatistics.ID FROM statistics
+            LEFT JOIN substatistics
+            ON statistics.type = substatistics.type;
+            """;
+
+    public static final String INSERT_PLAYER =
             "INSERT INTO " + playerTable +
                     " (name, UUID, isExcluded) VALUES(?, ?, ?);";
+
+    public static final String SELECT_ALL_FROM_STAT_TABLE =
+            "SELECT * FROM " + statTable + ";";
+
+    public static final String SELECT_ALL_FROM_SUB_STAT_TABLE =
+            "SELECT * FROM " + subStatTable + ";";
+
+    public static final String SELECT_ALL_STAT_COMBINATIONS_WITH_IDs =
+            """
+            SELECT * FROM statcombinations
+            LEFT JOIN substatistics
+            ON statcombinations.subStatisticID = substatistics.ID
+            LEFT JOIN statistics
+            ON statcombinations.statisticID = statistics.ID;
+            """;
+
+    public static final String SELECT_PLAYER_BY_UUID =
+            "SELECT * FROM " + playerTable +
+                    " WHERE UUID = ?;";
 
     public static final String UPDATE_PLAYER_NAME =
             "UPDATE " + playerTable +
