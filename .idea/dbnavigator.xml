@@ -153,7 +153,7 @@ insert into players (playerName, UUID, isExcluded) values ('Cyber', '53...', 0);
           <port value="" />
           <database value="" />
           <files>
-            <file path="C:\Users\elise\IdeaProjects\Database\test.db" schema="main" />
+            <file path="C:\Users\elise\IdeaProjects\DatabaseManager\test.db" schema="main" />
           </files>
           <type value="NONE" />
           <user value="" />

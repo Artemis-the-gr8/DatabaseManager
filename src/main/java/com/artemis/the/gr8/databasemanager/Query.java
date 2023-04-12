@@ -4,24 +4,24 @@ public class Query {
 
     private static final String playerTable = "players";
     private static final String statTable = "statistics";
-    private static final String subStatTable = "substatistics";
-    private static final String statCombinationTable = "statcombinations";
-    private static final String statValueTable = "statvalues";
+    private static final String subStatTable = "sub_statistics";
+    private static final String statCombinationTable = "stat_combinations";
+    private static final String statValueTable = "stat_values";
 
     public static final String CREATE_PLAYER_TABLE =
             """
             CREATE TABLE IF NOT EXISTS players (
-            ID INT AUTO_INCREMENT PRIMARY KEY,
+            id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(16),
-            UUID VARCHAR(255),
-            isExcluded BOOLEAN DEFAULT 0,
-            CONSTRAINT unique_UUID UNIQUE (UUID));
+            uuid VARCHAR(255),
+            is_excluded BOOLEAN DEFAULT 0,
+            CONSTRAINT unique_uuid UNIQUE (uuid));
             """;
 
     public static final String CREATE_STAT_TABLE =
             """
             CREATE TABLE IF NOT EXISTS statistics (
-            ID INT AUTO_INCREMENT PRIMARY KEY,
+            id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255),
             type VARCHAR (255) NOT NULL,
             CONSTRAINT unique_stat_name UNIQUE (name),
@@ -30,33 +30,33 @@ public class Query {
 
     public static final String CREATE_SUB_STAT_TABLE =
             """
-            CREATE TABLE IF NOT EXISTS substatistics (
-            ID INT AUTO_INCREMENT PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS sub_statistics (
+            id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255),
             type VARCHAR(255) NOT NULL,
             CONSTRAINT unique_sub_stat UNIQUE (name, type),
-            CONSTRAINT allowed_substat_types CHECK (type IN ('ENTITY', 'BLOCK', 'ITEM')));
+            CONSTRAINT allowed_sub_stat_types CHECK (type IN ('ENTITY', 'BLOCK', 'ITEM')));
             """;
 
     public static final String CREATE_STAT_COMBINATION_TABLE =
             """
-            CREATE TABLE IF NOT EXISTS statcombinations (
-            ID INT AUTO_INCREMENT PRIMARY KEY,
-            statisticID INT,
-            subStatisticID INT,
-            FOREIGN KEY (subStatisticID) REFERENCES substatistics(ID),
-            FOREIGN KEY (statisticID) REFERENCES statistics(ID),
-            CONSTRAINT unique_combination UNIQUE (statisticID, subStatisticID));
+            CREATE TABLE IF NOT EXISTS stat_combinations (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            stat_id INT,
+            sub_stat_id INT,
+            FOREIGN KEY (stat_id) REFERENCES statistics(id),
+            FOREIGN KEY (sub_stat_id) REFERENCES sub_statistics(id),
+            CONSTRAINT unique_combination UNIQUE (stat_id, sub_stat_id));
             """;
 
     public static final String CREATE_STAT_VALUE_TABLE =
             """
-            CREATE TABLE IF NOT EXISTS statvalues (
-            playerID INT,
-            statCombinationID INT,
+            CREATE TABLE IF NOT EXISTS stat_values (
+            player_id INT,
+            stat_combination_id INT,
             value INT,
-            FOREIGN KEY (playerID) REFERENCES players(ID),
-            FOREIGN KEY (statCombinationID) REFERENCES statcombinations(ID));
+            FOREIGN KEY (player_id) REFERENCES players(id),
+            FOREIGN KEY (stat_combination_id) REFERENCES stat_combinations(id));
             """;
 
     public static final String INSERT_STATISTIC =
@@ -69,15 +69,15 @@ public class Query {
 
     public static final String INSERT_ALL_STATS_AND_SUB_STATS_INTO_COMBINED_TABLE =
             """
-            INSERT INTO statcombinations (statisticID, subStatisticID)
-            SELECT statistics.ID, substatistics.ID FROM statistics
-            LEFT JOIN substatistics
-            ON statistics.type = substatistics.type;
+            INSERT INTO stat_combinations (stat_id, sub_stat_id)
+            SELECT statistics.id, sub_statistics.id FROM statistics
+            LEFT JOIN sub_statistics
+            ON statistics.type = sub_statistics.type;
             """;
 
     public static final String INSERT_PLAYER =
             "INSERT INTO " + playerTable +
-                    " (name, UUID, isExcluded) VALUES(?, ?, ?);";
+                    " (name, uuid, is_excluded) VALUES(?, ?, ?);";
 
     public static final String SELECT_ALL_FROM_STAT_TABLE =
             "SELECT * FROM " + statTable + ";";
@@ -87,18 +87,18 @@ public class Query {
 
     public static final String SELECT_ALL_STAT_COMBINATIONS_WITH_IDs =
             """
-            SELECT * FROM statcombinations
-            LEFT JOIN substatistics
-            ON statcombinations.subStatisticID = substatistics.ID
+            SELECT * FROM stat_combinations
+            LEFT JOIN sub_statistics
+            ON stat_combinations.sub_stat_id = sub_statistics.id
             LEFT JOIN statistics
-            ON statcombinations.statisticID = statistics.ID;
+            ON stat_combinations.stat_id = statistics.id;
             """;
 
     public static final String SELECT_PLAYER_BY_UUID =
             "SELECT * FROM " + playerTable +
-                    " WHERE UUID = ?;";
+                    " WHERE uuid = ?;";
 
     public static final String UPDATE_PLAYER_NAME =
             "UPDATE " + playerTable +
-                    " SET name = ? WHERE UUID = ?;";
+                    " SET name = ? WHERE uuid = ?;";
 }
