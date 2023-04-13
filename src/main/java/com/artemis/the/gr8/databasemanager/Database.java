@@ -46,11 +46,11 @@ public class Database {
         }
     }
 
-    private void updateStatTable(List<MyStatistic> statistics, Connection connection) {
+    protected void updateStatTable(List<MyStatistic> statistics, Connection connection) {
         if (statistics != null) {
             List<MyStatistic> currentlyStored = getAllStatistics(connection);
-            List<MyStatistic> newStatistics = filterOutExistingStats(statistics, currentlyStored);
-            insertIntoStatTable(newStatistics, connection);
+            currentlyStored.forEach(statistics::remove);
+            insertIntoStatTable(statistics, connection);
         }
     }
 

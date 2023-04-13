@@ -82,6 +82,9 @@ public class Query {
     public static final String SELECT_ALL_FROM_STAT_TABLE =
             "SELECT * FROM " + statTable + ";";
 
+    public static final String SELECT_COUNT_FROM_STAT_TABLE =
+            "SELECT COUNT(*) FROM " + statTable + ";";
+
     public static final String SELECT_ALL_FROM_SUB_STAT_TABLE =
             "SELECT * FROM " + subStatTable + ";";
 

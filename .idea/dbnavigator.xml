@@ -25,7 +25,10 @@ SELECT * FROM substatistics;]]></console>
     <connection id="0d9d0ee1-4f30-4b7f-9c8f-5f5b15bc443e">
       <console name="SQLite" type="STANDARD" schema="main" session="Main"><![CDATA[select * from players;
 insert into players (playerName, UUID, isExcluded) values ('Artemis', '46...', 0);
-insert into players (playerName, UUID, isExcluded) values ('Cyber', '53...', 0);]]></console>
+insert into players (playerName, UUID, isExcluded) values ('Cyber', '53...', 0);
+
+select * from statistics;
+show]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
@@ -48,6 +51,9 @@ insert into players (playerName, UUID, isExcluded) values ('Cyber', '53...', 0);
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
     <filters />
+  </component>
+  <component name="DBNavigator.Project.ParserDiagnosticsManager">
+    <diagnostics-history />
   </component>
   <component name="DBNavigator.Project.ScriptExecutionManager" clear-outputs="true">
     <recently-used-interfaces />
