@@ -15,8 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class DatabaseTest {
 
     private static String URL;
-    private static Database database;
-    private Connection connection;
+    protected static Database database;
+    protected Connection connection;
 
     @BeforeAll
     static void setup() {
@@ -55,6 +55,13 @@ public class DatabaseTest {
         if (file.exists()) {
             file.delete();
         }
+    }
+
+    protected void resetDatabase() {
+        closeConnection();
+        tearDown();
+        setup();
+        openConnection();
     }
 
     @Test

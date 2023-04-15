@@ -9,6 +9,17 @@ public class Timer {
     }
 
     public long stopTimer() {
-        return System.currentTimeMillis() - startTime;
+        long time = System.currentTimeMillis() - startTime;
+        startTime = System.currentTimeMillis();
+        return time;
+    }
+
+    public void stopTimerAndPrintTime() {
+        System.out.println("Time taken: " + (System.currentTimeMillis() - startTime));
+    }
+
+    public void restartTimerAndPrintTime() {
+        System.out.println("Time taken: " + (System.currentTimeMillis() - startTime));
+        startTime = System.currentTimeMillis();
     }
 }

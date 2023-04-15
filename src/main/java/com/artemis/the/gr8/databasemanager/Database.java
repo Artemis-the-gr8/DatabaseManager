@@ -38,8 +38,6 @@ public class Database {
             timer.startTimer();
             updateSubStatTable(subStatistics, connection);
             System.out.println("SubStatTable updated in " + timer.stopTimer() + "ms");
-
-
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -54,23 +52,17 @@ public class Database {
         }
     }
 
-    private void updateSubStatTable(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
-        if (subStatistics != null) {
-            try (Statement statement = connection.createStatement()) {
-                ResultSet resultSet = statement.executeQuery(Query.SELECT_ALL_FROM_SUB_STAT_TABLE);
-                List<MySubStatistic> newSubStatistics = filterOutExistingSubStatistics(subStatistics, resultSet);
-                resultSet.close();
+    protected void updateSubStatTable(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
+        SubStatTable table = new SubStatTable();
+        table.updateSubStatTable(subStatistics, connection);
+    }
 
-                insertIntoSubStatTable(newSubStatistics, connection);
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+    protected void updateSubStatTable2(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
+        SubStatTable table = new SubStatTable();
+        table.updateSubStatTable2(subStatistics, connection);
     }
 
     private void updateStatCombinationTable(Connection connection) {
-
 
     }
 
@@ -102,38 +94,11 @@ public class Database {
         return providedStats;
     }
 
-    private @NotNull List<MySubStatistic> filterOutExistingSubStatistics(List<MySubStatistic> providedSubStats, @NotNull ResultSet storedSubStats) throws SQLException {
-        ArrayList<MySubStatistic> newSubStatistics = new ArrayList<>(providedSubStats);
-        while (storedSubStats.next()) {
-            MySubStatistic currentRow = new MySubStatistic(
-                    storedSubStats.getString("name"),
-                    MyStatType.fromString(storedSubStats.getString("type")));
-
-            newSubStatistics.remove(currentRow);
-        }
-        return newSubStatistics;
-    }
-
-
     private void insertIntoStatTable(@NotNull List<MyStatistic> statistics, @NotNull Connection connection) {
         try (PreparedStatement statement = connection.prepareStatement(Query.INSERT_STATISTIC)){
             for (MyStatistic stat : statistics) {
                 statement.setString(1, stat.statName());
                 statement.setString(2, stat.statType().toString().toUpperCase(Locale.ENGLISH));
-                statement.addBatch();
-            }
-            statement.executeBatch();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void insertIntoSubStatTable(@NotNull List<MySubStatistic> subStats, @NotNull Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(Query.INSERT_SUB_STATISTIC)) {
-            for (MySubStatistic subStat : subStats) {
-                statement.setString(1, subStat.subStatName());
-                statement.setString(2, subStat.subStatType().toString().toUpperCase(Locale.ENGLISH));
                 statement.addBatch();
             }
             statement.executeBatch();
