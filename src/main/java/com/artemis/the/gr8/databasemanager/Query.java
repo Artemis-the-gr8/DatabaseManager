@@ -2,11 +2,15 @@ package com.artemis.the.gr8.databasemanager;
 
 public class Query {
 
-    private static final String playerTable = "players";
-    private static final String statTable = "statistics";
-    private static final String subStatTable = "sub_statistics";
-    private static final String statCombinationTable = "stat_combinations";
-    private static final String statValueTable = "stat_values";
+    protected static final String playerTable = "players";
+    protected static final String statTable = "statistics";
+    protected static final String subStatTable = "sub_statistics";
+    protected static final String statCombinationTable = "stat_combinations";
+    protected static final String statValueTable = "stat_values";
+
+    public static String selectAll(String tableName) {
+        return "SELECT * FROM " + tableName + ";";
+    }
 
     public static final String CREATE_PLAYER_TABLE =
             """

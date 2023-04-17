@@ -5,6 +5,7 @@ import com.artemis.the.gr8.databasemanager.datamodels.MySubStatistic;
 import com.artemis.the.gr8.databasemanager.datamodels.Timer;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
@@ -48,21 +49,9 @@ public class SubStatTableTest extends DatabaseTest {
         timer.startTimer();
         database.updateSubStatTable(subStats, connection);
         System.out.println("Inserted subStats 1 again: " + timer.stopTimer() + "ms");
-
-        timer.startTimer();
-        resetDatabase();
-        System.out.println("Reset database: " + timer.stopTimer() + "ms");
-
-        timer.startTimer();
-        database.updateSubStatTable2(subStats, connection);
-        System.out.println("Inserted subStats 2: " + timer.stopTimer() + "ms");
-
-        timer.startTimer();
-        database.updateSubStatTable2(subStats, connection);
-        System.out.println("Inserted subStats 2 again: " + timer.stopTimer() + "ms");
     }
 
-    private List<MySubStatistic> getAllSubStatsFromSpigot() {
+    private @NotNull List<MySubStatistic> getAllSubStatsFromSpigot() {
         List<MySubStatistic> subStats = new ArrayList<>();
         subStats.addAll(
                 Arrays.stream(Material.values())

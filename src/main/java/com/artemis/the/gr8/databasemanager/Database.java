@@ -54,12 +54,7 @@ public class Database {
 
     protected void updateSubStatTable(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
         SubStatTable table = new SubStatTable();
-        table.updateSubStatTable(subStatistics, connection);
-    }
-
-    protected void updateSubStatTable2(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
-        SubStatTable table = new SubStatTable();
-        table.updateSubStatTable2(subStatistics, connection);
+        table.update(subStatistics, connection);
     }
 
     private void updateStatCombinationTable(Connection connection) {
@@ -87,11 +82,6 @@ public class Database {
 
     private Map<Integer, Integer> findAllCombinations(@NotNull Connection connection) throws SQLException {
         return null;
-    }
-
-    protected @NotNull List<MyStatistic> filterOutExistingStats(@NotNull List<MyStatistic> providedStats, @NotNull List<MyStatistic> storedStats) {
-        storedStats.forEach(providedStats::remove);
-        return providedStats;
     }
 
     private void insertIntoStatTable(@NotNull List<MyStatistic> statistics, @NotNull Connection connection) {

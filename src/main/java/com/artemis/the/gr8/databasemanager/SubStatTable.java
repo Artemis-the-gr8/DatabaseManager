@@ -11,22 +11,13 @@ import java.util.Locale;
 
 public class SubStatTable {
 
-    protected void updateSubStatTable(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
-        if (subStatistics != null) {
-            try (Statement statement = connection.createStatement()) {
-                ResultSet resultSet = statement.executeQuery(Query.SELECT_ALL_FROM_SUB_STAT_TABLE);
-                List<MySubStatistic> newSubStatistics = filterOutExistingSubStatistics(subStatistics, resultSet);
-                resultSet.close();
+    private final String tableName;
 
-                insertIntoSubStatTable(newSubStatistics, connection);
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+    public SubStatTable() {
+        tableName = Query.subStatTable;
     }
 
-    protected void updateSubStatTable2(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
+    protected void update(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
         if (subStatistics != null) {
             List<MySubStatistic> currentlyStored = getAllSubStatistics(connection);
             currentlyStored.forEach(subStatistics::remove);
@@ -37,7 +28,7 @@ public class SubStatTable {
     private @NotNull List<MySubStatistic> getAllSubStatistics(@NotNull Connection connection) {
         ArrayList<MySubStatistic> allStats = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(Query.SELECT_ALL_FROM_STAT_TABLE);
+            ResultSet resultSet = statement.executeQuery(Query.selectAll(tableName));
 
             while (resultSet.next()) {
                 allStats.add(
@@ -51,18 +42,6 @@ public class SubStatTable {
             e.printStackTrace();
         }
         return allStats;
-    }
-
-    private @NotNull List<MySubStatistic> filterOutExistingSubStatistics(List<MySubStatistic> providedSubStats, @NotNull ResultSet storedSubStats) throws SQLException {
-        ArrayList<MySubStatistic> newSubStatistics = new ArrayList<>(providedSubStats);
-        while (storedSubStats.next()) {
-            MySubStatistic currentRow = new MySubStatistic(
-                    storedSubStats.getString("name"),
-                    MyStatType.fromString(storedSubStats.getString("type")));
-
-            newSubStatistics.remove(currentRow);
-        }
-        return newSubStatistics;
     }
 
     private void insertIntoSubStatTable(@NotNull List<MySubStatistic> subStats, @NotNull Connection connection) {
