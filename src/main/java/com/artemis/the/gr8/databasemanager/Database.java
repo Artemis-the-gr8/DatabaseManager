@@ -64,13 +64,13 @@ public class Database {
     private @NotNull List<MyStatistic> getAllStatistics(@NotNull Connection connection) {
         ArrayList<MyStatistic> allStats = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(Query.SELECT_ALL_FROM_STAT_TABLE);
+            ResultSet resultSet = statement.executeQuery(SQL.StatTable.selectAll());
 
             while (resultSet.next()) {
                 allStats.add(
                         new MyStatistic(
-                                resultSet.getString("name"),
-                                MyStatType.fromString(resultSet.getString("type"))));
+                                resultSet.getString(SQL.StatTable.NAME_COLUMN),
+                                MyStatType.fromString(resultSet.getString(SQL.StatTable.TYPE_COLUMN))));
             }
             resultSet.close();
         }
@@ -85,7 +85,7 @@ public class Database {
     }
 
     private void insertIntoStatTable(@NotNull List<MyStatistic> statistics, @NotNull Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(Query.INSERT_STATISTIC)){
+        try (PreparedStatement statement = connection.prepareStatement(SQL.INSERT_STATISTIC)){
             for (MyStatistic stat : statistics) {
                 statement.setString(1, stat.statName());
                 statement.setString(2, stat.statType().toString().toUpperCase(Locale.ENGLISH));
@@ -101,11 +101,13 @@ public class Database {
     private void createTablesIfNotExisting() {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)){
             Statement statement = connection.createStatement();
-            statement.addBatch(Query.CREATE_PLAYER_TABLE);
-            statement.addBatch(Query.CREATE_STAT_TABLE);
-            statement.addBatch(Query.CREATE_SUB_STAT_TABLE);
-            statement.addBatch(Query.CREATE_STAT_COMBINATION_TABLE);
-            statement.addBatch(Query.CREATE_STAT_VALUE_TABLE);
+
+            statement.addBatch(SQL.PlayerTable.createTable());
+            statement.addBatch(SQL.StatTable.createTable());
+            statement.addBatch(SQL.SubStatTable.createTable());
+            statement.addBatch(SQL.StatCombinationTable.createTable());
+            statement.addBatch(SQL.StatValueTable.createTable());
+
             statement.executeBatch();
             statement.close();
         }

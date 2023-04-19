@@ -27,8 +27,7 @@ SELECT * FROM substatistics;]]></console>
 insert into players (playerName, UUID, isExcluded) values ('Artemis', '46...', 0);
 insert into players (playerName, UUID, isExcluded) values ('Cyber', '53...', 0);
 
-select * from statistics;
-show]]></console>
+select * from statistics;]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">

@@ -75,7 +75,7 @@ public class DatabaseTest {
 
     private int getCountForStatTable() {
         try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(Query.SELECT_COUNT_FROM_STAT_TABLE);
+            ResultSet resultSet = statement.executeQuery(SQL.SELECT_COUNT_FROM_STAT_TABLE);
             resultSet.next();
             int count = resultSet.getInt(1);
             resultSet.close();
