@@ -1,30 +1,41 @@
 package com.artemis.the.gr8.databasemanager;
 
-import com.artemis.the.gr8.databasemanager.datamodels.MyPlayer;
-import com.artemis.the.gr8.databasemanager.datamodels.MyStatistic;
-import com.artemis.the.gr8.databasemanager.datamodels.MySubStatistic;
+import com.artemis.the.gr8.databasemanager.models.MyPlayer;
+import com.artemis.the.gr8.databasemanager.models.MyStatistic;
+import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
 
-public interface DatabaseManager {
+public class DatabaseManager {
+
+    private final Database database;
+
+    private DatabaseManager(String URL, String username, String password) {
+        database = new Database(URL, username, password);
+        database.setUp();
+    }
 
     //local MySQL URL for testing: jdbc:mysql://localhost:3306/minecraftstatdb
     @Contract("_, _, _ -> new")
-    static @NotNull Main getMySQLManager(String URL, String username, String password) {
-        return new Main(URL, username, password);
+    public static @NotNull DatabaseManager getMySQLManager(String URL, String username, String password) {
+        return new DatabaseManager(URL, username, password);
     }
 
-    static @NotNull Main getSQLiteManager(@NotNull File pluginDataFolder) {
+    public static @NotNull DatabaseManager getSQLiteManager(@NotNull File pluginDataFolder) {
         String URL = "jdbc:sqlite:" +
                 pluginDataFolder.getPath() +
                 "/stats.db";
-        return new Main(URL, null, null);
+        return new DatabaseManager(URL, null, null);
     }
 
-    void updateStatistics(List<MyStatistic> statistics, List<MySubStatistic> subStatistics);
+    public void updateStatistics(List<MyStatistic> statistics, List<MySubStatistic> subStatistics) {
+        database.updateStatistics(statistics, subStatistics);
+    }
 
-    void updatePlayers(List<MyPlayer> players);
+    public void updatePlayers(List<MyPlayer> players) {
+
+    }
 }

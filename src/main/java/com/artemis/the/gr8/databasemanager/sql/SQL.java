@@ -1,4 +1,4 @@
-package com.artemis.the.gr8.databasemanager;
+package com.artemis.the.gr8.databasemanager.sql;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -8,6 +8,11 @@ public class SQL {
     @Contract(pure = true)
     private static @NotNull String selectAllFrom(String tableName) {
         return "SELECT * FROM " + tableName + ";";
+    }
+
+    @Contract(pure = true)
+    private static @NotNull String selectCountFrom(String tableName) {
+        return "SELECT COUNT(*) FROM " + tableName + ";";
     }
 
     public static class PlayerTable {
@@ -33,6 +38,32 @@ public class SQL {
         public static @NotNull String selectAll() {
             return selectAllFrom(NAME);
         }
+
+        @Contract(pure = true)
+        public static @NotNull String selectCount() {
+            return selectCountFrom(NAME);
+        }
+
+        @Contract(pure = true)
+        public static @NotNull String selectByUUID() {
+            return "SELECT * FROM " + NAME +
+                    " WHERE " + UUID_COLUMN + " = ?;";
+        }
+
+        @Contract(pure = true)
+        public static @NotNull String insert() {
+            return "INSERT INTO " + NAME + " (" +
+                    NAME_COLUMN + ", " +
+                    UUID_COLUMN + ", " +
+                    IS_EXCLUDED_COLUMN + ") VALUES (?, ?, ?);";
+        }
+
+        @Contract(pure = true)
+        public static @NotNull String updateNameForUUID() {
+            return "UPDATE " + NAME +
+                    " SET " + NAME_COLUMN + " = ?" +
+                    " WHERE " + UUID_COLUMN + " = ?;";
+        }
     }
 
     public static class StatTable {
@@ -54,8 +85,20 @@ public class SQL {
         }
 
         @Contract(pure = true)
+        public static @NotNull String insert() {
+            return "INSERT INTO " + NAME + " (" +
+                    NAME_COLUMN + ", " +
+                    TYPE_COLUMN + ") VALUES (?, ?);";
+        }
+
+        @Contract(pure = true)
         public static @NotNull String selectAll() {
             return selectAllFrom(NAME);
+        }
+
+        @Contract(pure = true)
+        public static @NotNull String selectCount() {
+            return selectCountFrom(NAME);
         }
     }
 
@@ -83,6 +126,18 @@ public class SQL {
         @Contract(pure = true)
         public static @NotNull String selectAll() {
             return selectAllFrom(NAME);
+        }
+
+        @Contract(pure = true)
+        public static @NotNull String selectCount() {
+            return selectCountFrom(NAME);
+        }
+
+        @Contract(pure = true)
+        public static @NotNull String insert() {
+            return "INSERT INTO " + NAME + " (" +
+                    NAME_COLUMN + ", " +
+                    TYPE_COLUMN + ") VALUES (?, ?);";
         }
     }
 
@@ -114,6 +169,10 @@ public class SQL {
         public static @NotNull String selectAll() {
             return selectAllFrom(NAME);
         }
+
+        public static @NotNull String selectCount() {
+            return selectCountFrom(NAME);
+        }
     }
 
     public static class StatValueTable {
@@ -141,45 +200,9 @@ public class SQL {
         public static @NotNull String selectAll() {
             return selectAllFrom(NAME);
         }
+
+        public static @NotNull String selectCount() {
+            return selectCountFrom(NAME);
+        }
     }
-
-    public static final String INSERT_STATISTIC =
-            "INSERT INTO " + StatTable.NAME +
-                    " (name, type) VALUES (?, ?);";
-
-    public static final String INSERT_SUB_STATISTIC =
-            "INSERT INTO " + SubStatTable.NAME +
-                    " (name, type) VALUES (?, ?);";
-
-    public static final String INSERT_ALL_STATS_AND_SUB_STATS_INTO_COMBINED_TABLE =
-            """
-            INSERT INTO stat_combinations (stat_id, sub_stat_id)
-            SELECT statistics.id, sub_statistics.id FROM statistics
-            LEFT JOIN sub_statistics
-            ON statistics.type = sub_statistics.type;
-            """;
-
-    public static final String INSERT_PLAYER =
-            "INSERT INTO " + PlayerTable.NAME +
-                    " (name, uuid, is_excluded) VALUES(?, ?, ?);";
-
-    public static final String SELECT_COUNT_FROM_STAT_TABLE =
-            "SELECT COUNT(*) FROM " + StatTable.NAME + ";";
-
-    public static final String SELECT_ALL_STAT_COMBINATIONS_WITH_IDs =
-            """
-            SELECT * FROM stat_combinations
-            LEFT JOIN sub_statistics
-            ON stat_combinations.sub_stat_id = sub_statistics.id
-            LEFT JOIN statistics
-            ON stat_combinations.stat_id = statistics.id;
-            """;
-
-    public static final String SELECT_PLAYER_BY_UUID =
-            "SELECT * FROM " + PlayerTable.NAME +
-                    " WHERE uuid = ?;";
-
-    public static final String UPDATE_PLAYER_NAME =
-            "UPDATE " + PlayerTable.NAME +
-                    " SET name = ? WHERE uuid = ?;";
 }

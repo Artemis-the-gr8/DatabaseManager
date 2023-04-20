@@ -1,7 +1,7 @@
-package com.artemis.the.gr8.databasemanager;
+package com.artemis.the.gr8.databasemanager.sql;
 
-import com.artemis.the.gr8.databasemanager.datamodels.MyStatType;
-import com.artemis.the.gr8.databasemanager.datamodels.MySubStatistic;
+import com.artemis.the.gr8.databasemanager.models.MyStatType;
+import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
@@ -14,11 +14,11 @@ public class SubStatTable {
     public SubStatTable() {
     }
 
-    protected void update(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
+    public void update(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
         if (subStatistics != null) {
             List<MySubStatistic> currentlyStored = getAllSubStatistics(connection);
             currentlyStored.forEach(subStatistics::remove);
-            insertIntoSubStatTable(subStatistics, connection);
+            insert(subStatistics, connection);
         }
     }
 
@@ -42,8 +42,8 @@ public class SubStatTable {
         return allStats;
     }
 
-    private void insertIntoSubStatTable(@NotNull List<MySubStatistic> subStats, @NotNull Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(SQL.INSERT_SUB_STATISTIC)) {
+    private void insert(@NotNull List<MySubStatistic> subStats, @NotNull Connection connection) {
+        try (PreparedStatement statement = connection.prepareStatement(SQL.SubStatTable.insert())) {
             for (MySubStatistic subStat : subStats) {
                 statement.setString(1, subStat.subStatName());
                 statement.setString(2, subStat.subStatType().toString().toUpperCase(Locale.ENGLISH));
