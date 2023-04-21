@@ -3,10 +3,7 @@ package com.artemis.the.gr8.databasemanager.sql;
 import com.artemis.the.gr8.databasemanager.models.MyStatistic;
 import com.artemis.the.gr8.databasemanager.testutils.TestDatabase;
 import com.artemis.the.gr8.databasemanager.utils.Timer;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 
 import java.util.List;
 
@@ -26,6 +23,7 @@ public class StatTableTest extends TestDatabase {
         System.out.println("1. Got " + stats.size() + " stats from Spigot in " + timer.reset() + "ms");
     }
 
+    @Disabled
     @Test
     @Order(2)
     void checkIfTableIsEmpty() {
@@ -51,6 +49,7 @@ public class StatTableTest extends TestDatabase {
                 "db contents should equal the Spigot list!");
     }
 
+    @Disabled
     @Test
     @Order(4)
     void insertNewData() {

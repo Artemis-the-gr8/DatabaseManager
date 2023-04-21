@@ -11,25 +11,34 @@ import static com.artemis.the.gr8.databasemanager.sql.SQL.*;
 public class TestDatabase {
 
     private static String URL;
+    private static String USERNAME;
+    private static String PASSWORD;
+
     protected static TestDataProvider testDataProvider;
     protected static Database database;
     protected Connection connection;
 
+    //local MySQL URL for testing: jdbc:mysql://localhost:3306/minecraftstatdb
     @BeforeAll
     static void setup() {
         testDataProvider = new TestDataProvider();
 
-        File file = new File(System.getProperty("user.dir"));
-        URL = "jdbc:sqlite:" + file.getPath() + "/test.db";
+//        File file = new File(System.getProperty("user.dir"));
+//        URL = "jdbc:sqlite:" + file.getPath() + "/test.db";
+//        database = new Database(URL, null, null);
 
-        database = new Database(URL, null, null);
+        URL = "jdbc:mysql://localhost:3306/minecraftstatdb";
+        USERNAME = "myuser";
+        PASSWORD = "myuser";
+        database = new Database(URL, USERNAME, PASSWORD);
+
         database.setUp();
     }
 
     @BeforeEach
     void openConnection() {
         try {
-            connection = DriverManager.getConnection(URL);
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
         }
         catch (SQLException e) {
             throw new RuntimeException("Could not get database connection!");
@@ -48,13 +57,13 @@ public class TestDatabase {
         }
     }
 
-    @AfterAll
+/*    @AfterAll
     static void tearDown() {
         File file = new File(System.getProperty("user.dir") + "/test.db");
         if (file.exists()) {
             file.delete();
         }
-    }
+    }*/
 
     protected int getCountForTable(String tableName) {
         String query = switch (tableName) {

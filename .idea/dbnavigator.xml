@@ -27,7 +27,10 @@ SELECT * FROM substatistics;]]></console>
 insert into players (playerName, UUID, isExcluded) values ('Artemis', '46...', 0);
 insert into players (playerName, UUID, isExcluded) values ('Cyber', '53...', 0);
 
-select * from statistics;]]></console>
+select * from statistics;
+select count(*) from sub_statistics where type = 'ITEM'; /* 411 too many */
+select count(*) from sub_statistics where type = 'ENTITY'; /* 1 too many (UNKNOWN) */
+select count(*) from sub_statistics where type = 'BLOCK'; /* 254 too many */]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">

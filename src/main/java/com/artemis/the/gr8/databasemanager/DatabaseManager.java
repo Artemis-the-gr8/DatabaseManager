@@ -18,7 +18,6 @@ public class DatabaseManager {
         database.setUp();
     }
 
-    //local MySQL URL for testing: jdbc:mysql://localhost:3306/minecraftstatdb
     @Contract("_, _, _ -> new")
     public static @NotNull DatabaseManager getMySQLManager(String URL, String username, String password) {
         return new DatabaseManager(URL, username, password);
