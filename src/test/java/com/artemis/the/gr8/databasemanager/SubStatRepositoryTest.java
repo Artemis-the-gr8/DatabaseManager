@@ -1,6 +1,7 @@
-package com.artemis.the.gr8.databasemanager.sql;
+package com.artemis.the.gr8.databasemanager;
 
 import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
+import com.artemis.the.gr8.databasemanager.sql.SQL;
 import com.artemis.the.gr8.databasemanager.testutils.TestDatabase;
 import com.artemis.the.gr8.databasemanager.utils.Timer;
 import org.junit.jupiter.api.*;
@@ -9,7 +10,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class SubStatTableTest extends TestDatabase {
+public class SubStatRepositoryTest extends TestDatabase {
 
     @Test
     @Order(1)
@@ -29,13 +30,13 @@ public class SubStatTableTest extends TestDatabase {
         assertEquals(0, getCountForTable(SQL.SubStatTable.NAME),
                 "sub_statistics should be empty after creation of fresh db!");
 
-        System.out.println("2. Confirmed db is empty");
+        System.out.println("2. Confirmed sub_stat_table is empty");
     }
 
     @Test
     @Order(3)
     void insertSpigotData() {
-        SubStatTable table = new SubStatTable();
+        SubStatRepository table = new SubStatRepository();
         List<MySubStatistic> subStats = testDataProvider.getAllSubStatsFromSpigot();
 
         Timer timer = Timer.start();
@@ -51,7 +52,7 @@ public class SubStatTableTest extends TestDatabase {
     @Test
     @Order(4)
     void updateWithSameSpigotData() {
-        SubStatTable table = new SubStatTable();
+        SubStatRepository table = new SubStatRepository();
         List<MySubStatistic> subStats = testDataProvider.getAllSubStatsFromSpigot();
         int oldTableSize = getCountForTable(SQL.SubStatTable.NAME);
 

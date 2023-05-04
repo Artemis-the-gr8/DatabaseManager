@@ -3,10 +3,6 @@ package com.artemis.the.gr8.databasemanager;
 import com.artemis.the.gr8.databasemanager.models.MyStatistic;
 import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
 import com.artemis.the.gr8.databasemanager.sql.SQL;
-import com.artemis.the.gr8.databasemanager.sql.StatTable;
-import com.artemis.the.gr8.databasemanager.sql.SubStatTable;
-import com.artemis.the.gr8.databasemanager.utils.Timer;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.*;
@@ -31,29 +27,16 @@ public class Database {
     }
 
     public void updateStatistics(List<MyStatistic> statistics, List<MySubStatistic> subStatistics) {
-        Timer timer = Timer.start();
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)){
-            System.out.println("Connection made in " + timer.reset() + "ms");
+            StatRepository statRepository = new StatRepository();
+            statRepository.update(statistics, connection);
 
-            updateStatTable(statistics, connection);
-            System.out.println("StatTable updated in " + timer.reset() + "ms");
-
-            updateSubStatTable(subStatistics, connection);
-            System.out.println("SubStatTable updated in " + timer.reset() + "ms");
+            SubStatRepository subStatRepository = new SubStatRepository();
+            subStatRepository.update(subStatistics, connection);
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    protected void updateStatTable(List<MyStatistic> statistics, Connection connection) {
-        StatTable table = new StatTable();
-        table.update(statistics, connection);
-    }
-
-    protected void updateSubStatTable(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
-        SubStatTable table = new SubStatTable();
-        table.update(subStatistics, connection);
     }
 
 

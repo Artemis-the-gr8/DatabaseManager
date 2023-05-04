@@ -1,6 +1,7 @@
-package com.artemis.the.gr8.databasemanager.sql;
+package com.artemis.the.gr8.databasemanager;
 
 import com.artemis.the.gr8.databasemanager.models.MyStatistic;
+import com.artemis.the.gr8.databasemanager.sql.SQL;
 import com.artemis.the.gr8.databasemanager.testutils.TestDatabase;
 import com.artemis.the.gr8.databasemanager.utils.Timer;
 import org.junit.jupiter.api.*;
@@ -10,7 +11,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class StatTableTest extends TestDatabase {
+public class StatRepositoryTest extends TestDatabase {
 
     @Test
     @Order(1)
@@ -30,30 +31,34 @@ public class StatTableTest extends TestDatabase {
         assertEquals(0, getCountForTable(SQL.StatTable.NAME),
                 "statistics should be empty after creation of fresh db!");
 
-        System.out.println("2. Confirmed db is empty");
+        System.out.println("2. Confirmed stat_table is empty");
     }
 
     @Test
     @Order(3)
     void insertSpigotData() {
-        StatTable table = new StatTable();
+        StatRepository table = new StatRepository();
         List<MyStatistic> stats = testDataProvider.getAllStatsFromSpigot();
 
         Timer timer = Timer.start();
-        table.update(stats, connection);
-        System.out.println("3. Inserted " + stats.size() + " stats into db in " + timer.reset() + "ms");
+        int before = getCountForTable(SQL.StatTable.NAME);
 
+        table.update(stats, connection);
         int expectedCount = stats.size();
         int actualCount = getCountForTable(SQL.StatTable.NAME);
+
         assertEquals(expectedCount, actualCount,
                 "db contents should equal the Spigot list!");
+
+        System.out.println("3. Inserted " + (actualCount - before) + " stats into db in " + timer.reset() + "ms" +
+                "\n" + "   Table now contains " + actualCount + " entries");
     }
 
     @Disabled
     @Test
     @Order(4)
     void insertNewData() {
-        StatTable table = new StatTable();
+        StatRepository table = new StatRepository();
         List<MyStatistic> stats = testDataProvider.getSomeFakeStats();
         int oldTableSize = getCountForTable(SQL.StatTable.NAME);
 

@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class SQL {
 
+    public static @NotNull String UNIVERSAL_ID_COLUMN = "id";
+
     @Contract(pure = true)
     private static @NotNull String selectAllFrom(String tableName) {
         return "SELECT * FROM " + tableName + ";";
@@ -13,6 +15,18 @@ public class SQL {
     @Contract(pure = true)
     private static @NotNull String selectCountFrom(String tableName) {
         return "SELECT COUNT(*) FROM " + tableName + ";";
+    }
+
+    public static @NotNull String selectStatsAndMatchingSubStats() {
+        return "SELECT " +
+                    StatTable.NAME + ".id, " +
+                    SubStatTable.NAME + ".id FROM" + StatTable.NAME +
+                "LEFT JOIN " + SubStatTable.NAME +
+                "ON " + StatTable.NAME + "." + StatTable.TYPE_COLUMN + " = " +
+                    SubStatTable.NAME + "." + SubStatTable.TYPE_COLUMN +
+                "WHERE (" + StatTable.NAME + ".id, " + SubStatTable.NAME + ".id) NOT IN" +
+                "(SELECT " + StatCombinationTable.STAT_ID_COLUMN + ", " + StatCombinationTable.SUB_STAT_ID_COLUMN +
+                    " FROM " + StatCombinationTable.NAME + ");";
     }
 
     public static class PlayerTable {
@@ -172,6 +186,12 @@ public class SQL {
 
         public static @NotNull String selectCount() {
             return selectCountFrom(NAME);
+        }
+
+        public static @NotNull String insert() {
+            return "INSERT INTO " + NAME + " (" +
+                    STAT_ID_COLUMN + ", " +
+                    SUB_STAT_ID_COLUMN + ") VALUES (?, ?);";
         }
     }
 

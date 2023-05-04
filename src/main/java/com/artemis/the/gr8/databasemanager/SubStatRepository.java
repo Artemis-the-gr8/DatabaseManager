@@ -1,28 +1,55 @@
-package com.artemis.the.gr8.databasemanager.sql;
+package com.artemis.the.gr8.databasemanager;
 
 import com.artemis.the.gr8.databasemanager.models.MyStatType;
 import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
+import com.artemis.the.gr8.databasemanager.sql.SQL;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 
-public class SubStatTable {
+public class SubStatRepository {
 
-    public SubStatTable() {
+    public SubStatRepository() {
     }
 
     public void update(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
         if (subStatistics != null) {
             List<MySubStatistic> currentlyStored = getAllSubStatistics(connection);
-            currentlyStored.forEach(subStatistics::remove);
-            insert(subStatistics, connection);
+            List<MySubStatistic> newValues = subStatistics.stream()
+                            .filter(Predicate.not(currentlyStored::contains))
+                                    .toList();
+
+            insert(newValues, connection);
         }
     }
 
-    private @NotNull List<MySubStatistic> getAllSubStatistics(@NotNull Connection connection) {
+    protected @NotNull HashMap<MySubStatistic, Integer> getAllSubStatisticsWithID(@NotNull Connection connection) {
+        HashMap<MySubStatistic, Integer> subStats = new HashMap<>();
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(
+                    SQL.SubStatTable.selectAll());
+
+            while (resultSet.next()) {
+                subStats.put(
+                        new MySubStatistic(
+                                resultSet.getString(SQL.SubStatTable.NAME_COLUMN),
+                                MyStatType.fromString(resultSet.getString(SQL.SubStatTable.TYPE_COLUMN))),
+                        resultSet.getInt(SQL.UNIVERSAL_ID_COLUMN));
+            }
+            resultSet.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return subStats;
+    }
+
+    protected @NotNull List<MySubStatistic> getAllSubStatistics(@NotNull Connection connection) {
         ArrayList<MySubStatistic> allStats = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(
