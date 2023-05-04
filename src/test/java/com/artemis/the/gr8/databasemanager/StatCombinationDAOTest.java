@@ -10,7 +10,7 @@ import org.junit.jupiter.api.*;
 import java.util.HashMap;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class StatCombinationRepositoryTest extends TestDatabase {
+public class StatCombinationDAOTest extends TestDatabase {
 
     @Disabled
     @Test
@@ -25,9 +25,9 @@ public class StatCombinationRepositoryTest extends TestDatabase {
     @Test
     @Order(2)
     void insertCombinations() {
-        StatCombinationRepository combiTable = new StatCombinationRepository();
-        StatRepository statTable = new StatRepository();
-        SubStatRepository subStatTable = new SubStatRepository();
+        StatCombinationDAO combiTable = new StatCombinationDAO();
+        StatDAO statTable = new StatDAO();
+        SubStatDAO subStatTable = new SubStatDAO();
 
         Timer timer = Timer.start();
         HashMap<MyStatistic, Integer> stats = statTable.getAllStatisticsWithID(connection);

@@ -28,11 +28,11 @@ public class Database {
 
     public void updateStatistics(List<MyStatistic> statistics, List<MySubStatistic> subStatistics) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)){
-            StatRepository statRepository = new StatRepository();
-            statRepository.update(statistics, connection);
+            StatDAO statDAO = new StatDAO();
+            statDAO.update(statistics, connection);
 
-            SubStatRepository subStatRepository = new SubStatRepository();
-            subStatRepository.update(subStatistics, connection);
+            SubStatDAO subStatDAO = new SubStatDAO();
+            subStatDAO.update(subStatistics, connection);
         }
         catch (SQLException e) {
             e.printStackTrace();

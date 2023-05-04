@@ -12,9 +12,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-public class StatCombinationRepository {
+public class StatCombinationDAO {
 
-    public StatCombinationRepository() {
+    public StatCombinationDAO() {
     }
 
     public void update(HashMap<MyStatistic, Integer> stats, HashMap<MySubStatistic, Integer> subStats, @NotNull Connection connection) {

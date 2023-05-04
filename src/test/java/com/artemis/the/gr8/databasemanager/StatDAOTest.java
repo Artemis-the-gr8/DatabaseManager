@@ -11,7 +11,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class StatRepositoryTest extends TestDatabase {
+public class StatDAOTest extends TestDatabase {
 
     @Test
     @Order(1)
@@ -37,7 +37,7 @@ public class StatRepositoryTest extends TestDatabase {
     @Test
     @Order(3)
     void insertSpigotData() {
-        StatRepository table = new StatRepository();
+        StatDAO table = new StatDAO();
         List<MyStatistic> stats = testDataProvider.getAllStatsFromSpigot();
 
         Timer timer = Timer.start();
@@ -58,7 +58,7 @@ public class StatRepositoryTest extends TestDatabase {
     @Test
     @Order(4)
     void insertNewData() {
-        StatRepository table = new StatRepository();
+        StatDAO table = new StatDAO();
         List<MyStatistic> stats = testDataProvider.getSomeFakeStats();
         int oldTableSize = getCountForTable(SQL.StatTable.NAME);
 

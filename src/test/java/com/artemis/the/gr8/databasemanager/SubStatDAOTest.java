@@ -10,7 +10,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class SubStatRepositoryTest extends TestDatabase {
+public class SubStatDAOTest extends TestDatabase {
 
     @Test
     @Order(1)
@@ -36,7 +36,7 @@ public class SubStatRepositoryTest extends TestDatabase {
     @Test
     @Order(3)
     void insertSpigotData() {
-        SubStatRepository table = new SubStatRepository();
+        SubStatDAO table = new SubStatDAO();
         List<MySubStatistic> subStats = testDataProvider.getAllSubStatsFromSpigot();
 
         Timer timer = Timer.start();
@@ -52,7 +52,7 @@ public class SubStatRepositoryTest extends TestDatabase {
     @Test
     @Order(4)
     void updateWithSameSpigotData() {
-        SubStatRepository table = new SubStatRepository();
+        SubStatDAO table = new SubStatDAO();
         List<MySubStatistic> subStats = testDataProvider.getAllSubStatsFromSpigot();
         int oldTableSize = getCountForTable(SQL.SubStatTable.NAME);
 

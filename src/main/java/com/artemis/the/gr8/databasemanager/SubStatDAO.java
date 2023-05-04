@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
 
-public class SubStatRepository {
+public class SubStatDAO {
 
-    public SubStatRepository() {
+    public SubStatDAO() {
     }
 
     public void update(List<MySubStatistic> subStatistics, @NotNull Connection connection) {

@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
 
-public class StatRepository {
+public class StatDAO {
 
-    public StatRepository() {
+    public StatDAO() {
     }
 
     public void update(List<MyStatistic> statistics, Connection connection) {
