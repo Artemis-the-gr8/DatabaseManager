@@ -24,7 +24,6 @@ public class StatDAOTest extends TestDatabase {
         System.out.println("1. Got " + stats.size() + " stats from Spigot in " + timer.reset() + "ms");
     }
 
-    @Disabled
     @Test
     @Order(2)
     void checkIfTableIsEmpty() {
@@ -54,7 +53,6 @@ public class StatDAOTest extends TestDatabase {
                 "\n" + "   Table now contains " + actualCount + " entries");
     }
 
-    @Disabled
     @Test
     @Order(4)
     void insertNewData() {

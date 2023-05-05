@@ -72,8 +72,8 @@ public class SubStatDAO {
     private void insert(@NotNull List<MySubStatistic> subStats, @NotNull Connection connection) {
         try (PreparedStatement statement = connection.prepareStatement(SQL.SubStatTable.insert())) {
             for (MySubStatistic subStat : subStats) {
-                statement.setString(1, subStat.subStatName());
-                statement.setString(2, subStat.subStatType().toString().toUpperCase(Locale.ENGLISH));
+                statement.setString(1, subStat.name());
+                statement.setString(2, subStat.type().toString().toUpperCase(Locale.ENGLISH));
                 statement.addBatch();
             }
             statement.executeBatch();

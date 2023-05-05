@@ -69,8 +69,8 @@ public class StatDAO {
     private void insert(@NotNull List<MyStatistic> statistics, @NotNull Connection connection) {
         try (PreparedStatement statement = connection.prepareStatement(SQL.StatTable.insert())){
             for (MyStatistic stat : statistics) {
-                statement.setString(1, stat.statName());
-                statement.setString(2, stat.statType().toString().toUpperCase(Locale.ENGLISH));
+                statement.setString(1, stat.name());
+                statement.setString(2, stat.type().toString().toUpperCase(Locale.ENGLISH));
                 statement.addBatch();
             }
             statement.executeBatch();

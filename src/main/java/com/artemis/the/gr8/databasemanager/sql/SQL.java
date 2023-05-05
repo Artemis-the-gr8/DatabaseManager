@@ -1,5 +1,6 @@
 package com.artemis.the.gr8.databasemanager.sql;
 
+import com.artemis.the.gr8.databasemanager.models.MyStatType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -147,11 +148,29 @@ public class SQL {
             return selectCountFrom(NAME);
         }
 
+        public static @NotNull String selectEntityType() {
+            return selectType(MyStatType.ENTITY.getName());
+        }
+
+        public static @NotNull String selectItemType() {
+            return selectType(MyStatType.ITEM.getName());
+        }
+
+        public static @NotNull String selectBlockType() {
+            return selectType(MyStatType.BLOCK.getName());
+        }
+
         @Contract(pure = true)
         public static @NotNull String insert() {
             return "INSERT INTO " + NAME + " (" +
                     NAME_COLUMN + ", " +
                     TYPE_COLUMN + ") VALUES (?, ?);";
+        }
+
+        @Contract(pure = true)
+        private static @NotNull String selectType(String type) {
+            return "SELECT * FROM " + NAME +
+                    " WHERE " + TYPE_COLUMN + " = '" + type + "';";
         }
     }
 

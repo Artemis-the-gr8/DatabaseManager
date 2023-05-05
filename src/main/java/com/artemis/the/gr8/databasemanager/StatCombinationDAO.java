@@ -17,19 +17,23 @@ public class StatCombinationDAO {
     public StatCombinationDAO() {
     }
 
-    public void update(HashMap<MyStatistic, Integer> stats, HashMap<MySubStatistic, Integer> subStats, @NotNull Connection connection) {
-        ArrayList<int[]> currentlyStored = getAllStoredCombinations(connection);
-        ArrayList<int[]> combinations = findAllValidCombinations(stats, subStats);
-        ArrayList<int[]> newValues = combinations.stream()
-                .filter(entry -> currentlyStored.stream()
+    public void update(@NotNull Connection connection) {
+        ArrayList<int[]> combinations = getAllValidCombinations(connection);
+        ArrayList<int[]> currentlyStored = getCurrentContentsOfCombinationTable(connection);
+
+        ArrayList<int[]> newValues =
+                combinations.stream()
+                        .filter(entry -> currentlyStored.stream()
                         .noneMatch(
                                 storedEntry -> Arrays.equals(storedEntry, entry)))
-                .collect(Collectors.toCollection(ArrayList::new));
+                        .collect(Collectors.toCollection(ArrayList::new));
 
         insert(newValues, connection);
     }
 
-    protected @NotNull ArrayList<int[]> getAllStoredCombinations(@NotNull Connection connection) {
+
+
+    protected @NotNull ArrayList<int[]> getCurrentContentsOfCombinationTable(@NotNull Connection connection) {
         ArrayList<int[]> combinations = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(SQL.StatCombinationTable.selectAll());
@@ -47,37 +51,81 @@ public class StatCombinationDAO {
         return combinations;
     }
 
-    protected @NotNull ArrayList<int[]> findAllValidCombinations(@NotNull HashMap<MyStatistic, Integer> stats, @NotNull HashMap<MySubStatistic, Integer> subStats) {
+    protected @NotNull ArrayList<int[]> getAllValidCombinations(@NotNull Connection connection) {
+        HashMap<MyStatistic, Integer> storedStats = getAllStoredStats(connection);
+        HashMap<MySubStatistic, Integer> entitySubStats = getEntitySubStats(connection);
+        HashMap<MySubStatistic, Integer> itemSubStats = getItemSubStats(connection);
+        HashMap<MySubStatistic, Integer> blockSubStats = getBlockSubStats(connection);
         ArrayList<int[]> combinations = new ArrayList<>();
-        HashMap<MyStatistic, Integer> copyOfStats = new HashMap<>(stats);
 
-        stats.forEach((stat, statID) -> {
-            if (stat.statType() == MyStatType.CUSTOM) {
-                combinations.add(new int[]{statID, 0});
-                copyOfStats.remove(stat);
+        storedStats.forEach((stat, statID) -> {
+            switch (stat.type()) {
+                case CUSTOM -> combinations.add(new int[]{statID, 0});
+                case ENTITY ->
+                        entitySubStats.forEach((subStat, subStatID) ->
+                                combinations.add(new int[]{statID, subStatID}));
+                case ITEM ->
+                        itemSubStats.forEach((subStat, subStatID) ->
+                                combinations.add(new int[]{statID, subStatID}));
+                case BLOCK ->
+                        blockSubStats.forEach((subStat, subStatID) ->
+                                combinations.add(new int[]{statID, subStatID}));
             }
         });
 
-       subStats.forEach((subStat, subStatID) -> {
-           switch (subStat.subStatType()) {
-               case ENTITY -> copyOfStats.forEach((stat, statID) -> {
-                   if (stat.statType() == MyStatType.ENTITY) {
-                       combinations.add(new int[]{statID, subStatID});
-                   }
-               });
-               case ITEM -> copyOfStats.forEach((stat, statID) -> {
-                   if (stat.statType() == MyStatType.ITEM) {
-                       combinations.add(new int[]{statID, subStatID});
-                   }
-               });
-               case BLOCK -> copyOfStats.forEach((stat, statID) -> {
-                   if (stat.statType() == MyStatType.BLOCK) {
-                       combinations.add(new int[]{statID, subStatID});
-                   }
-               });
-           }
-       });
        return combinations;
+    }
+
+    private @NotNull HashMap<MyStatistic, Integer> getAllStoredStats(@NotNull Connection connection) {
+        HashMap<MyStatistic, Integer> stats = new HashMap<>();
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(SQL.StatTable.selectAll());
+
+            while (resultSet.next()) {
+                stats.put(
+                        new MyStatistic(
+                                resultSet.getString(SQL.StatTable.NAME_COLUMN),
+                                MyStatType.fromString(resultSet.getString(SQL.StatTable.TYPE_COLUMN))),
+                        resultSet.getInt(SQL.UNIVERSAL_ID_COLUMN));
+            }
+            resultSet.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
+
+    private @NotNull HashMap<MySubStatistic, Integer> getEntitySubStats(@NotNull Connection connection) {
+        return getSubStats(connection, SQL.SubStatTable.selectEntityType());
+    }
+
+    private @NotNull HashMap<MySubStatistic, Integer> getItemSubStats(@NotNull Connection connection) {
+        return getSubStats(connection, SQL.SubStatTable.selectItemType());
+    }
+
+    private @NotNull HashMap<MySubStatistic, Integer> getBlockSubStats(@NotNull Connection connection) {
+        return getSubStats(connection, SQL.SubStatTable.selectBlockType());
+    }
+
+    private @NotNull HashMap<MySubStatistic, Integer> getSubStats(@NotNull Connection connection, String selectStatement) {
+        HashMap<MySubStatistic, Integer> subStats = new HashMap<>();
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(selectStatement);
+
+            while (resultSet.next()) {
+                subStats.put(
+                        new MySubStatistic(
+                                resultSet.getString(SQL.SubStatTable.NAME_COLUMN),
+                                MyStatType.fromString(resultSet.getString(SQL.SubStatTable.TYPE_COLUMN))),
+                        resultSet.getInt(SQL.UNIVERSAL_ID_COLUMN));
+            }
+            resultSet.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return subStats;
     }
 
     private void insert(@NotNull ArrayList<int[]> combinations, @NotNull Connection connection) {

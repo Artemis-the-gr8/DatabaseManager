@@ -1,6 +1,8 @@
 package com.artemis.the.gr8.databasemanager.testutils;
 
 import com.artemis.the.gr8.databasemanager.Database;
+import com.artemis.the.gr8.databasemanager.StatDAO;
+import com.artemis.the.gr8.databasemanager.SubStatDAO;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
@@ -23,14 +25,14 @@ public class TestDatabase {
     static void setup() {
         testDataProvider = new TestDataProvider();
 
-//        File file = new File(System.getProperty("user.dir"));
-//        URL = "jdbc:sqlite:" + file.getPath() + "/test.db";
-//        database = new Database(URL, null, null);
+        File file = new File(System.getProperty("user.dir"));
+        URL = "jdbc:sqlite:" + file.getPath() + "/test.db";
+        database = new Database(URL, null, null);
 
-        URL = "jdbc:mysql://localhost:3306/minecraftstatdb";
-        USERNAME = "myuser";
-        PASSWORD = "myuser";
-        database = new Database(URL, USERNAME, PASSWORD);
+//        URL = "jdbc:mysql://localhost:3306/minecraftstatdb";
+//        USERNAME = "myuser";
+//        PASSWORD = "myuser";
+//        database = new Database(URL, USERNAME, PASSWORD);
 
         database.setUp();
     }
@@ -57,13 +59,13 @@ public class TestDatabase {
         }
     }
 
-/*    @AfterAll
+    @AfterAll
     static void tearDown() {
         File file = new File(System.getProperty("user.dir") + "/test.db");
         if (file.exists()) {
             file.delete();
         }
-    }*/
+    }
 
     protected int getCountForTable(String tableName) {
         String query = switch (tableName) {
@@ -86,5 +88,15 @@ public class TestDatabase {
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    protected void fillStatTableWithSpigotData() {
+        StatDAO statDAO = new StatDAO();
+        statDAO.update(testDataProvider.getAllStatsFromSpigot(), connection);
+    }
+
+    protected void fillSubStatTableWithSpigotData() {
+        SubStatDAO subStatDAO = new SubStatDAO();
+        subStatDAO.update(testDataProvider.getAllSubStatsFromSpigot(), connection);
     }
 }

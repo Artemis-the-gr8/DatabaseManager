@@ -23,7 +23,6 @@ public class SubStatDAOTest extends TestDatabase {
         System.out.println("1. Got " + subStatistics.size() + " sub_stats from Spigot in " + timer.reset() + "ms");
     }
 
-    @Disabled
     @Test
     @Order(2)
     void checkIfTableIsEmpty() {
