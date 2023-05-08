@@ -26,6 +26,7 @@ public class SubStatDAOTest extends TestDatabase {
     @Test
     @Order(2)
     void checkIfTableIsEmpty() {
+        Assumptions.assumeTrue(useSQLite);
         assertEquals(0, getCountForTable(SQL.SubStatTable.NAME),
                 "sub_statistics should be empty after creation of fresh db!");
 

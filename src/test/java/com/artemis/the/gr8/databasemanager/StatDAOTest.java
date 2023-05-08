@@ -27,6 +27,7 @@ public class StatDAOTest extends TestDatabase {
     @Test
     @Order(2)
     void checkIfTableIsEmpty() {
+        Assumptions.assumeTrue(useSQLite);
         assertEquals(0, getCountForTable(SQL.StatTable.NAME),
                 "statistics should be empty after creation of fresh db!");
 

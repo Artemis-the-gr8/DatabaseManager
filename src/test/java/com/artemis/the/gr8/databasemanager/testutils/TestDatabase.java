@@ -12,6 +12,8 @@ import static com.artemis.the.gr8.databasemanager.sql.SQL.*;
 
 public class TestDatabase {
 
+    protected static final boolean useSQLite = false;
+
     private static String URL;
     private static String USERNAME;
     private static String PASSWORD;
@@ -25,15 +27,19 @@ public class TestDatabase {
     static void setup() {
         testDataProvider = new TestDataProvider();
 
-        File file = new File(System.getProperty("user.dir"));
-        URL = "jdbc:sqlite:" + file.getPath() + "/test.db";
-        database = new Database(URL, null, null);
+        if (useSQLite) {
+            File file = new File(System.getProperty("user.dir"));
+            URL = "jdbc:sqlite:" + file.getPath() + "/test.db";
+            USERNAME = null;
+            PASSWORD = null;
+        }
+        else {
+            URL = "jdbc:mysql://localhost:3306/minecraftstatdb";
+            USERNAME = "myuser";
+            PASSWORD = "myuser";
+        }
 
-//        URL = "jdbc:mysql://localhost:3306/minecraftstatdb";
-//        USERNAME = "myuser";
-//        PASSWORD = "myuser";
-//        database = new Database(URL, USERNAME, PASSWORD);
-
+        database = new Database(URL, USERNAME, PASSWORD);
         database.setUp();
     }
 
@@ -61,6 +67,7 @@ public class TestDatabase {
 
     @AfterAll
     static void tearDown() {
+        Assumptions.assumeTrue(useSQLite);
         File file = new File(System.getProperty("user.dir") + "/test.db");
         if (file.exists()) {
             file.delete();
