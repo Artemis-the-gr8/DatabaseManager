@@ -33,7 +33,7 @@ public class StatCombinationDAO {
 
 
 
-    protected @NotNull ArrayList<int[]> getCurrentContentsOfCombinationTable(@NotNull Connection connection) {
+    private @NotNull ArrayList<int[]> getCurrentContentsOfCombinationTable(@NotNull Connection connection) {
         ArrayList<int[]> combinations = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(SQL.StatCombinationTable.selectAll());
@@ -51,7 +51,7 @@ public class StatCombinationDAO {
         return combinations;
     }
 
-    protected @NotNull ArrayList<int[]> getAllValidCombinations(@NotNull Connection connection) {
+    private @NotNull ArrayList<int[]> getAllValidCombinations(@NotNull Connection connection) {
         HashMap<MyStatistic, Integer> storedStats = getAllStoredStats(connection);
         HashMap<MySubStatistic, Integer> entitySubStats = getEntitySubStats(connection);
         HashMap<MySubStatistic, Integer> itemSubStats = getItemSubStats(connection);

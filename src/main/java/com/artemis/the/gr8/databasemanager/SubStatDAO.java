@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
@@ -28,28 +27,7 @@ public class SubStatDAO {
         }
     }
 
-    protected @NotNull HashMap<MySubStatistic, Integer> getAllSubStatisticsWithID(@NotNull Connection connection) {
-        HashMap<MySubStatistic, Integer> subStats = new HashMap<>();
-        try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(
-                    SQL.SubStatTable.selectAll());
-
-            while (resultSet.next()) {
-                subStats.put(
-                        new MySubStatistic(
-                                resultSet.getString(SQL.SubStatTable.NAME_COLUMN),
-                                MyStatType.fromString(resultSet.getString(SQL.SubStatTable.TYPE_COLUMN))),
-                        resultSet.getInt(SQL.UNIVERSAL_ID_COLUMN));
-            }
-            resultSet.close();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return subStats;
-    }
-
-    protected @NotNull List<MySubStatistic> getAllSubStatistics(@NotNull Connection connection) {
+    private @NotNull List<MySubStatistic> getAllSubStatistics(@NotNull Connection connection) {
         ArrayList<MySubStatistic> allStats = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(

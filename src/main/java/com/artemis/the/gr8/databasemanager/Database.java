@@ -33,6 +33,9 @@ public class Database {
 
             SubStatDAO subStatDAO = new SubStatDAO();
             subStatDAO.update(subStatistics, connection);
+
+            StatCombinationDAO combinationDAO = new StatCombinationDAO();
+            combinationDAO.update(connection);
         }
         catch (SQLException e) {
             e.printStackTrace();
