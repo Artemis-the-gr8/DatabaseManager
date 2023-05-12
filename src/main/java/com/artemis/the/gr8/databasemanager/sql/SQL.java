@@ -18,18 +18,6 @@ public class SQL {
         return "SELECT COUNT(*) FROM " + tableName + ";";
     }
 
-    public static @NotNull String selectStatsAndMatchingSubStats() {
-        return "SELECT " +
-                    StatTable.NAME + ".id, " +
-                    SubStatTable.NAME + ".id FROM" + StatTable.NAME +
-                "LEFT JOIN " + SubStatTable.NAME +
-                "ON " + StatTable.NAME + "." + StatTable.TYPE_COLUMN + " = " +
-                    SubStatTable.NAME + "." + SubStatTable.TYPE_COLUMN +
-                "WHERE (" + StatTable.NAME + ".id, " + SubStatTable.NAME + ".id) NOT IN" +
-                "(SELECT " + StatCombinationTable.STAT_ID_COLUMN + ", " + StatCombinationTable.SUB_STAT_ID_COLUMN +
-                    " FROM " + StatCombinationTable.NAME + ");";
-    }
-
     public static class PlayerTable {
 
         public static final String NAME = "players";
@@ -74,9 +62,10 @@ public class SQL {
         }
 
         @Contract(pure = true)
-        public static @NotNull String updateNameForUUID() {
-            return "UPDATE " + NAME +
-                    " SET " + NAME_COLUMN + " = ?" +
+        public static @NotNull String updateWhereMatchingUUID() {
+            return "UPDATE " + NAME + " SET " +
+                    NAME_COLUMN + " = ?, " +
+                    IS_EXCLUDED_COLUMN + " = ?" +
                     " WHERE " + UUID_COLUMN + " = ?;";
         }
     }

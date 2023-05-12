@@ -3,6 +3,7 @@ package com.artemis.the.gr8.databasemanager.testutils;
 import com.artemis.the.gr8.databasemanager.Database;
 import com.artemis.the.gr8.databasemanager.StatDAO;
 import com.artemis.the.gr8.databasemanager.SubStatDAO;
+import com.artemis.the.gr8.databasemanager.sql.SQL;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
@@ -91,8 +92,8 @@ public class TestDatabase {
             resultSet.close();
 
             return count;
-
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -105,5 +106,22 @@ public class TestDatabase {
     protected void fillSubStatTableWithSpigotData() {
         SubStatDAO subStatDAO = new SubStatDAO();
         subStatDAO.update(testDataProvider.getAllSubStatsFromSpigot(), connection);
+    }
+
+    protected String getNameOfTzvi_FromPlayerTable() {
+        try (PreparedStatement statement = connection.prepareStatement(SQL.PlayerTable.selectByUUID())) {
+            statement.setString(1, testDataProvider.getUUIDForTzvi_().toString());
+            statement.addBatch();
+
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            String name = resultSet.getString(PlayerTable.NAME_COLUMN);
+            resultSet.close();
+
+            return name;
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 }

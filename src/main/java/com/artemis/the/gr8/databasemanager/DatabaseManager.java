@@ -35,6 +35,6 @@ public class DatabaseManager {
     }
 
     public void updatePlayers(List<MyPlayer> players) {
-
+        database.updatePlayers(players);
     }
 }

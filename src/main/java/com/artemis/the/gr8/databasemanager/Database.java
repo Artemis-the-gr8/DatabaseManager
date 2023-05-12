@@ -1,5 +1,6 @@
 package com.artemis.the.gr8.databasemanager;
 
+import com.artemis.the.gr8.databasemanager.models.MyPlayer;
 import com.artemis.the.gr8.databasemanager.models.MyStatistic;
 import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
 import com.artemis.the.gr8.databasemanager.sql.SQL;
@@ -27,7 +28,7 @@ public class Database {
     }
 
     public void updateStatistics(List<MyStatistic> statistics, List<MySubStatistic> subStatistics) {
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)){
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             StatDAO statDAO = new StatDAO();
             statDAO.update(statistics, connection);
 
@@ -42,9 +43,18 @@ public class Database {
         }
     }
 
+    public void updatePlayers(List<MyPlayer> players) {
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            PlayerDAO playerDAO = new PlayerDAO();
+            playerDAO.update(players, connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void createTablesIfNotExisting() {
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)){
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             Statement statement = connection.createStatement();
 
             statement.addBatch(SQL.PlayerTable.createTable());
