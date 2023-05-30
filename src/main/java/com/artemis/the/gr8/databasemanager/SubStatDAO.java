@@ -6,7 +6,7 @@ import com.artemis.the.gr8.databasemanager.sql.SQL;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
@@ -18,7 +18,7 @@ public class SubStatDAO {
 
     public void update(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
         if (subStatistics != null) {
-            List<MySubStatistic> currentlyStored = getAllSubStatistics(connection);
+            List<MySubStatistic> currentlyStored = getAllSubStats(connection).values().stream().toList();
             List<MySubStatistic> newValues = subStatistics.stream()
                             .filter(Predicate.not(currentlyStored::contains))
                                     .toList();
@@ -27,14 +27,30 @@ public class SubStatDAO {
         }
     }
 
-    private @NotNull List<MySubStatistic> getAllSubStatistics(@NotNull Connection connection) {
-        ArrayList<MySubStatistic> allStats = new ArrayList<>();
+    public @NotNull HashMap<Integer, MySubStatistic> getAllSubStats(@NotNull Connection connection) {
+        return getSubStats(connection, SQL.SubStatTable.selectAll());
+    }
+
+    public @NotNull HashMap<Integer, MySubStatistic> getEntitySubStats(@NotNull Connection connection) {
+        return getSubStats(connection, SQL.SubStatTable.selectEntityType());
+    }
+
+    public @NotNull HashMap<Integer, MySubStatistic> getItemSubStats(@NotNull Connection connection) {
+        return getSubStats(connection, SQL.SubStatTable.selectItemType());
+    }
+
+    public @NotNull HashMap<Integer, MySubStatistic> getBlockSubStats(@NotNull Connection connection) {
+        return getSubStats(connection, SQL.SubStatTable.selectBlockType());
+    }
+
+    private @NotNull HashMap<Integer, MySubStatistic> getSubStats(@NotNull Connection connection, String selectStatement) {
+        HashMap<Integer, MySubStatistic> allStats = new HashMap<>();
         try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(
-                    SQL.SubStatTable.selectAll());
+            ResultSet resultSet = statement.executeQuery(selectStatement);
 
             while (resultSet.next()) {
-                allStats.add(
+                allStats.put(
+                        resultSet.getInt(SQL.UNIVERSAL_ID_COLUMN),
                         new MySubStatistic(
                                 resultSet.getString(SQL.SubStatTable.NAME_COLUMN),
                                 MyStatType.fromString(resultSet.getString(SQL.SubStatTable.TYPE_COLUMN))));

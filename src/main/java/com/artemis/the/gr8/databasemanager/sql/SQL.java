@@ -4,6 +4,8 @@ import com.artemis.the.gr8.databasemanager.models.MyStatType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 public class SQL {
 
     public static @NotNull String UNIVERSAL_ID_COLUMN = "id";
@@ -48,9 +50,15 @@ public class SQL {
         }
 
         @Contract(pure = true)
-        public static @NotNull String selectByUUID() {
-            return "SELECT * FROM " + NAME +
-                    " WHERE " + UUID_COLUMN + " = ?;";
+        public static @NotNull String selectNameFromUUID(UUID uuid) {
+            return "SELECT " + NAME_COLUMN + " FROM " + NAME +
+                    " WHERE " + UUID_COLUMN + " = '" + uuid.toString() + "';";
+        }
+
+        @Contract(pure = true)
+        public static @NotNull String selectIdFromUUID(UUID uuid) {
+            return "SELECT " + UNIVERSAL_ID_COLUMN + " FROM " + NAME +
+                    " WHERE " + UUID_COLUMN + " = '" + uuid.toString() + "';";
         }
 
         @Contract(pure = true)
@@ -114,6 +122,7 @@ public class SQL {
 
         @Contract(pure = true)
         public static @NotNull String createTable() {
+            //TODO SQLite doesn't support the AUTO_INCREMENT keyword. Make different create version for both database types
             return "CREATE TABLE IF NOT EXISTS " + SubStatTable.NAME +
                     "( " +
                     "id INT AUTO_INCREMENT PRIMARY KEY," +

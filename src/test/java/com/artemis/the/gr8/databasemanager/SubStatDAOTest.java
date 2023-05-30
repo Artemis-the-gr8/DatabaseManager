@@ -40,11 +40,15 @@ public class SubStatDAOTest extends TestDatabase {
         List<MySubStatistic> subStats = testDataProvider.getAllSubStatsFromSpigot();
 
         Timer timer = Timer.start();
-        table.update(subStats, connection);
-        System.out.println("3. Inserted " + subStats.size() + " sub_stats into db in " + timer.reset() + "ms");
 
+        int initialCount = getCountForTable(SQL.SubStatTable.NAME);
+        table.update(subStats, connection);
         int expectedCount = subStats.size();
         int actualCount = getCountForTable(SQL.SubStatTable.NAME);
+
+        System.out.println("3. Inserted " + (actualCount - initialCount) + " of " + subStats.size() +
+                " total sub_stats list into db in " + timer.reset() + "ms");
+
         assertEquals(expectedCount, actualCount,
                 "db contents should equal the Spigot list!");
     }

@@ -109,11 +109,11 @@ public class TestDatabase {
     }
 
     protected String getNameOfTzvi_FromPlayerTable() {
-        try (PreparedStatement statement = connection.prepareStatement(SQL.PlayerTable.selectByUUID())) {
-            statement.setString(1, testDataProvider.getUUIDForTzvi_().toString());
-            statement.addBatch();
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(
+                    SQL.PlayerTable.selectNameFromUUID(
+                            testDataProvider.getUUIDForTzvi_()));
 
-            ResultSet resultSet = statement.executeQuery();
             resultSet.next();
             String name = resultSet.getString(PlayerTable.NAME_COLUMN);
             resultSet.close();

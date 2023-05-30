@@ -37,6 +37,23 @@ public class PlayerDAO {
         }
     }
 
+    public int getPlayerID(UUID playerUUID, @NotNull Connection connection) throws NullPointerException {
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(
+                    SQL.PlayerTable.selectIdFromUUID(playerUUID));
+
+            resultSet.next();
+            int id = resultSet.getInt(SQL.UNIVERSAL_ID_COLUMN);
+            resultSet.close();
+
+            return id;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            throw new NullPointerException("Something went wrong and no playerID has been found!");
+        }
+    }
+
     private @NotNull List<MyPlayer> getAllPlayers(@NotNull Connection connection) {
         ArrayList<MyPlayer> players = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
