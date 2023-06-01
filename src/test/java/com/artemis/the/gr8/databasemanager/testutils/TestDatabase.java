@@ -33,14 +33,17 @@ public class TestDatabase {
             URL = "jdbc:sqlite:" + file.getPath() + "/test.db";
             USERNAME = null;
             PASSWORD = null;
+
+            database = Database.getSQLiteDatabase(URL);
         }
         else {
             URL = "jdbc:mysql://localhost:3306/minecraftstatdb";
             USERNAME = "myuser";
             PASSWORD = "myuser";
+
+            database = Database.getMySQLDatabase(URL, USERNAME, PASSWORD);
         }
 
-        database = new Database(URL, USERNAME, PASSWORD);
         database.setUp();
     }
 

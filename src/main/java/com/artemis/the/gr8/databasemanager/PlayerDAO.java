@@ -1,7 +1,7 @@
 package com.artemis.the.gr8.databasemanager;
 
 import com.artemis.the.gr8.databasemanager.models.MyPlayer;
-import com.artemis.the.gr8.databasemanager.sql.SQL;
+import com.artemis.the.gr8.databasemanager.sql.PlayerTableQueries;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
@@ -11,7 +11,19 @@ import java.util.UUID;
 
 public class PlayerDAO {
 
-    public PlayerDAO() {
+    private final PlayerTableQueries sqlQueries;
+
+    public PlayerDAO(PlayerTableQueries playerTableQueries) {
+        sqlQueries = playerTableQueries;
+    }
+
+    public void create(@NotNull Connection connection) {
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(sqlQueries.createTable());
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void update(List<MyPlayer> players, Connection connection) {
@@ -40,10 +52,10 @@ public class PlayerDAO {
     public int getPlayerID(UUID playerUUID, @NotNull Connection connection) throws NullPointerException {
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(
-                    SQL.PlayerTable.selectIdFromUUID(playerUUID));
+                    sqlQueries.selectIdFromUUID(playerUUID));
 
             resultSet.next();
-            int id = resultSet.getInt(SQL.UNIVERSAL_ID_COLUMN);
+            int id = resultSet.getInt(sqlQueries.ID_COLUMN);
             resultSet.close();
 
             return id;
@@ -57,14 +69,14 @@ public class PlayerDAO {
     private @NotNull List<MyPlayer> getAllPlayers(@NotNull Connection connection) {
         ArrayList<MyPlayer> players = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(SQL.PlayerTable.selectAll());
+            ResultSet resultSet = statement.executeQuery(sqlQueries.selectAll());
 
             while (resultSet.next()) {
                 players.add(
                         new MyPlayer(
-                                resultSet.getString(SQL.PlayerTable.NAME_COLUMN),
-                                UUID.fromString(resultSet.getString(SQL.PlayerTable.UUID_COLUMN)),
-                                resultSet.getBoolean(SQL.PlayerTable.IS_EXCLUDED_COLUMN)));
+                                resultSet.getString(sqlQueries.NAME_COLUMN),
+                                UUID.fromString(resultSet.getString(sqlQueries.UUID_COLUMN)),
+                                resultSet.getBoolean(sqlQueries.IS_EXCLUDED_COLUMN)));
             }
             resultSet.close();
         }
@@ -75,7 +87,7 @@ public class PlayerDAO {
     }
 
     private void updateExisting(@NotNull List<MyPlayer> players, @NotNull Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(SQL.PlayerTable.updateWhereMatchingUUID())) {
+        try (PreparedStatement statement = connection.prepareStatement(sqlQueries.updateWhereMatchingUUID())) {
             for (MyPlayer player : players) {
                 statement.setString(1, player.playerName());
                 statement.setBoolean(2, player.isExcluded());
@@ -90,7 +102,7 @@ public class PlayerDAO {
     }
 
     private void insert(@NotNull List<MyPlayer> players, @NotNull Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(SQL.PlayerTable.insert())) {
+        try (PreparedStatement statement = connection.prepareStatement(sqlQueries.insert())) {
             for (MyPlayer player : players) {
                 statement.setString(1, player.playerName());
                 statement.setString(2, player.playerUUID().toString());

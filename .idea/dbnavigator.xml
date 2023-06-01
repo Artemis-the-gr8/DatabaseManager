@@ -30,7 +30,14 @@ insert into players (playerName, UUID, isExcluded) values ('Cyber', '53...', 0);
 select * from statistics;
 select count(*) from sub_statistics where type = 'ITEM'; /* 411 too many */
 select count(*) from sub_statistics where type = 'ENTITY'; /* 1 too many (UNKNOWN) */
-select count(*) from sub_statistics where type = 'BLOCK'; /* 254 too many */]]></console>
+select count(*) from sub_statistics where type = 'BLOCK'; /* 254 too many */
+
+CREATE TABLE IF NOT EXISTS players (
+id INTEGER PRIMARY KEY autoincrement, 
+name VARCHAR(16), 
+uuid VARCHAR(255), 
+is_excluded BOOLEAN DEFAULT 0, 
+CONSTRAINT unique_uuid UNIQUE (uuid));]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">

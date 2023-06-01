@@ -25,24 +25,6 @@ public class SQL {
         public static final String NAME = "players";
         public static final String NAME_COLUMN = "name";
         public static final String UUID_COLUMN = "uuid";
-        public static final String IS_EXCLUDED_COLUMN = "is_excluded";
-
-        @Contract(pure = true)
-        public static @NotNull String createTable() {
-            return "CREATE TABLE IF NOT EXISTS " + NAME +
-                    " (" +
-                    "id INT AUTO_INCREMENT PRIMARY KEY," +
-                    NAME_COLUMN + " VARCHAR(16)," +
-                    UUID_COLUMN + " VARCHAR(255)," +
-                    IS_EXCLUDED_COLUMN + " BOOLEAN DEFAULT 0," +
-                    "CONSTRAINT unique_uuid UNIQUE (" + UUID_COLUMN + ")" +
-                    ");";
-        }
-
-        @Contract(pure = true)
-        public static @NotNull String selectAll() {
-            return selectAllFrom(NAME);
-        }
 
         @Contract(pure = true)
         public static @NotNull String selectCount() {
@@ -53,28 +35,6 @@ public class SQL {
         public static @NotNull String selectNameFromUUID(UUID uuid) {
             return "SELECT " + NAME_COLUMN + " FROM " + NAME +
                     " WHERE " + UUID_COLUMN + " = '" + uuid.toString() + "';";
-        }
-
-        @Contract(pure = true)
-        public static @NotNull String selectIdFromUUID(UUID uuid) {
-            return "SELECT " + UNIVERSAL_ID_COLUMN + " FROM " + NAME +
-                    " WHERE " + UUID_COLUMN + " = '" + uuid.toString() + "';";
-        }
-
-        @Contract(pure = true)
-        public static @NotNull String insert() {
-            return "INSERT INTO " + NAME + " (" +
-                    NAME_COLUMN + ", " +
-                    UUID_COLUMN + ", " +
-                    IS_EXCLUDED_COLUMN + ") VALUES (?, ?, ?);";
-        }
-
-        @Contract(pure = true)
-        public static @NotNull String updateWhereMatchingUUID() {
-            return "UPDATE " + NAME + " SET " +
-                    NAME_COLUMN + " = ?, " +
-                    IS_EXCLUDED_COLUMN + " = ?" +
-                    " WHERE " + UUID_COLUMN + " = ?;";
         }
     }
 

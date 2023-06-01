@@ -4,6 +4,9 @@ import com.artemis.the.gr8.databasemanager.models.MyPlayer;
 import com.artemis.the.gr8.databasemanager.models.MyStatistic;
 import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
 import com.artemis.the.gr8.databasemanager.sql.SQL;
+import com.artemis.the.gr8.databasemanager.sql.mysql.MySQLPlayerTableQueries;
+import com.artemis.the.gr8.databasemanager.sql.sqlite.SQLitePlayerTableQueries;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.*;
@@ -17,10 +20,26 @@ public class Database {
     private final String USER;
     private final String PASSWORD;
 
-    public Database(String URL, String username, String password) {
+    protected PlayerDAO playerDAO;
+
+    private Database(String URL, String username, String password) {
         this.URL = URL;
         this.USER = username;
         this.PASSWORD = password;
+    }
+
+    public static @NotNull Database getMySQLDatabase(String URL, String userName, String password) {
+        Database database = new Database(URL, userName, password);
+        database.playerDAO = new PlayerDAO(new MySQLPlayerTableQueries());
+
+        return database;
+    }
+
+    public static @NotNull Database getSQLiteDatabase(String URL) {
+        Database database = new Database(URL, null, null);
+        database.playerDAO = new PlayerDAO(new SQLitePlayerTableQueries());
+
+        return database;
     }
 
     public void setUp() {
@@ -45,7 +64,6 @@ public class Database {
 
     public void updatePlayers(List<MyPlayer> players) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            PlayerDAO playerDAO = new PlayerDAO();
             playerDAO.update(players, connection);
         }
         catch (SQLException e) {
@@ -55,9 +73,9 @@ public class Database {
 
     private void createTablesIfNotExisting() {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            Statement statement = connection.createStatement();
+            playerDAO.create(connection);
 
-            statement.addBatch(SQL.PlayerTable.createTable());
+            Statement statement = connection.createStatement();
             statement.addBatch(SQL.StatTable.createTable());
             statement.addBatch(SQL.SubStatTable.createTable());
             statement.addBatch(SQL.StatCombinationTable.createTable());

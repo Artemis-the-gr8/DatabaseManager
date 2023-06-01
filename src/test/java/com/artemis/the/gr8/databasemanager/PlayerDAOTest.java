@@ -14,13 +14,12 @@ public class PlayerDAOTest extends TestDatabase {
     @Test
     @Order(1)
     void insertFakePlayers() {
-        PlayerDAO table = new PlayerDAO();
         List<MyPlayer> players = testDataProvider.getSomeFakePlayers();
 
         int before = getCountForTable(SQL.PlayerTable.NAME);
         Timer timer = Timer.start();
 
-        table.update(players, connection);
+        database.playerDAO.update(players, connection);
         int expectedCount = players.size();
         int actualCount = getCountForTable(SQL.PlayerTable.NAME);
 
@@ -34,12 +33,11 @@ public class PlayerDAOTest extends TestDatabase {
     @Test
     @Order(2)
     void updateNameForExistingTzvi_Entry() {
-        PlayerDAO table = new PlayerDAO();
         List<MyPlayer> players = testDataProvider.getSameFakePlayersWithOneNewName();
         String currentName = getNameOfTzvi_FromPlayerTable();
 
         Timer timer = Timer.start();
-        table.update(players, connection);
+        database.playerDAO.update(players, connection);
         String newName = getNameOfTzvi_FromPlayerTable();
 
         Assertions.assertNotEquals(currentName, newName, "Tzvi_'s name should have updated!");
