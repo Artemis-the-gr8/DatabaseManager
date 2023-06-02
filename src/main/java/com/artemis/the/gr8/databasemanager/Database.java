@@ -3,9 +3,8 @@ package com.artemis.the.gr8.databasemanager;
 import com.artemis.the.gr8.databasemanager.models.MyPlayer;
 import com.artemis.the.gr8.databasemanager.models.MyStatistic;
 import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
-import com.artemis.the.gr8.databasemanager.sql.SQL;
-import com.artemis.the.gr8.databasemanager.sql.mysql.MySQLPlayerTableQueries;
-import com.artemis.the.gr8.databasemanager.sql.sqlite.SQLitePlayerTableQueries;
+import com.artemis.the.gr8.databasemanager.sql.mysql.*;
+import com.artemis.the.gr8.databasemanager.sql.sqlite.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
@@ -21,6 +20,10 @@ public class Database {
     private final String PASSWORD;
 
     protected PlayerDAO playerDAO;
+    protected StatDAO statDAO;
+    protected SubStatDAO subStatDAO;
+    protected StatCombinationDAO statCombinationDAO;
+    protected StatValueDAO statValueDAO;
 
     private Database(String URL, String username, String password) {
         this.URL = URL;
@@ -31,6 +34,10 @@ public class Database {
     public static @NotNull Database getMySQLDatabase(String URL, String userName, String password) {
         Database database = new Database(URL, userName, password);
         database.playerDAO = new PlayerDAO(new MySQLPlayerTableQueries());
+        database.statDAO = new StatDAO(new MySQLStatTableQueries());
+        database.subStatDAO = new SubStatDAO(new MySQLSubStatTableQueries());
+        database.statCombinationDAO = new StatCombinationDAO(database.statDAO, database.subStatDAO, new MySQLStatCombinationTableQueries());
+        database.statValueDAO = new StatValueDAO(new MySQLStatValueTableQueries());
 
         return database;
     }
@@ -38,6 +45,10 @@ public class Database {
     public static @NotNull Database getSQLiteDatabase(String URL) {
         Database database = new Database(URL, null, null);
         database.playerDAO = new PlayerDAO(new SQLitePlayerTableQueries());
+        database.statDAO = new StatDAO(new SQLiteStatTableQueries());
+        database.subStatDAO = new SubStatDAO(new SQLiteSubStatTableQueries());
+        database.statCombinationDAO = new StatCombinationDAO(database.statDAO, database.subStatDAO, new SQLiteStatCombinationTableQueries());
+        database.statValueDAO = new StatValueDAO(new SQLiteStatValueTableQueries());
 
         return database;
     }
@@ -48,17 +59,22 @@ public class Database {
 
     public void updateStatistics(List<MyStatistic> statistics, List<MySubStatistic> subStatistics) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            StatDAO statDAO = new StatDAO();
             statDAO.update(statistics, connection);
-
-            SubStatDAO subStatDAO = new SubStatDAO();
             subStatDAO.update(subStatistics, connection);
-
-            StatCombinationDAO combinationDAO = new StatCombinationDAO();
-            combinationDAO.update(connection);
+            statCombinationDAO.update(connection);
         }
         catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    protected HashMap<Integer, MyStatistic> getAllStatistics() {
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            return statDAO.getAllStatistics(connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            throw new NullPointerException("Getting all statistics has failed!");
         }
     }
 
@@ -74,15 +90,10 @@ public class Database {
     private void createTablesIfNotExisting() {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             playerDAO.create(connection);
-
-            Statement statement = connection.createStatement();
-            statement.addBatch(SQL.StatTable.createTable());
-            statement.addBatch(SQL.SubStatTable.createTable());
-            statement.addBatch(SQL.StatCombinationTable.createTable());
-            statement.addBatch(SQL.StatValueTable.createTable());
-
-            statement.executeBatch();
-            statement.close();
+            statDAO.create(connection);
+            subStatDAO.create(connection);
+            statCombinationDAO.create(connection);
+            statValueDAO.create(connection);
         }
         catch (SQLException e) {
             e.printStackTrace();

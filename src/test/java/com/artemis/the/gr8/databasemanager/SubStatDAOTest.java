@@ -1,8 +1,6 @@
 package com.artemis.the.gr8.databasemanager;
 
 import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
-import com.artemis.the.gr8.databasemanager.sql.SQL;
-import com.artemis.the.gr8.databasemanager.testutils.TestDatabase;
 import com.artemis.the.gr8.databasemanager.utils.Timer;
 import org.junit.jupiter.api.*;
 
@@ -27,7 +25,7 @@ public class SubStatDAOTest extends TestDatabase {
     @Order(2)
     void checkIfTableIsEmpty() {
         Assumptions.assumeTrue(useSQLite);
-        assertEquals(0, getCountForTable(SQL.SubStatTable.NAME),
+        assertEquals(0, database.subStatDAO.getAllSubStatsCount(connection),
                 "sub_statistics should be empty after creation of fresh db!");
 
         System.out.println("2. Confirmed sub_stat_table is empty");
@@ -36,15 +34,14 @@ public class SubStatDAOTest extends TestDatabase {
     @Test
     @Order(3)
     void insertSpigotData() {
-        SubStatDAO table = new SubStatDAO();
         List<MySubStatistic> subStats = testDataProvider.getAllSubStatsFromSpigot();
 
         Timer timer = Timer.start();
 
-        int initialCount = getCountForTable(SQL.SubStatTable.NAME);
-        table.update(subStats, connection);
+        int initialCount = database.subStatDAO.getAllSubStatsCount(connection);
+        database.subStatDAO.update(subStats, connection);
         int expectedCount = subStats.size();
-        int actualCount = getCountForTable(SQL.SubStatTable.NAME);
+        int actualCount = database.subStatDAO.getAllSubStatsCount(connection);
 
         System.out.println("3. Inserted " + (actualCount - initialCount) + " of " + subStats.size() +
                 " total sub_stats list into db in " + timer.reset() + "ms");
@@ -56,15 +53,14 @@ public class SubStatDAOTest extends TestDatabase {
     @Test
     @Order(4)
     void updateWithSameSpigotData() {
-        SubStatDAO table = new SubStatDAO();
         List<MySubStatistic> subStats = testDataProvider.getAllSubStatsFromSpigot();
-        int oldTableSize = getCountForTable(SQL.SubStatTable.NAME);
+        int oldTableSize = database.subStatDAO.getAllSubStatsCount(connection);
 
         Timer timer = Timer.start();
-        table.update(subStats, connection);
+        database.subStatDAO.update(subStats, connection);
         System.out.println("4. Checked for new values in " + timer.reset() + "ms");
 
-        int newTableSize = getCountForTable(SQL.SubStatTable.NAME);
+        int newTableSize = database.subStatDAO.getAllSubStatsCount(connection);
         assertEquals(oldTableSize, newTableSize,
                 "sub_statistics should have no new entries!");
     }

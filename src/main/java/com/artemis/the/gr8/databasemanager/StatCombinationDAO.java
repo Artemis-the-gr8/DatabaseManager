@@ -2,7 +2,7 @@ package com.artemis.the.gr8.databasemanager;
 
 import com.artemis.the.gr8.databasemanager.models.MyStatistic;
 import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
-import com.artemis.the.gr8.databasemanager.sql.SQL;
+import com.artemis.the.gr8.databasemanager.sql.StatCombinationTableQueries;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
@@ -13,7 +13,23 @@ import java.util.stream.Collectors;
 
 public class StatCombinationDAO {
 
-    public StatCombinationDAO() {
+    private final StatDAO statDAO;
+    private final SubStatDAO subStatDAO;
+    private final StatCombinationTableQueries sqlQueries;
+
+    public StatCombinationDAO(StatDAO statDAO, SubStatDAO subStatDAO, StatCombinationTableQueries subStatTableQueries) {
+        this.statDAO = statDAO;
+        this.subStatDAO = subStatDAO;
+        sqlQueries = subStatTableQueries;
+    }
+
+    protected void create(@NotNull Connection connection) {
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(sqlQueries.createTable());
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void update(@NotNull Connection connection) {
@@ -30,17 +46,29 @@ public class StatCombinationDAO {
         insert(newValues, connection);
     }
 
-
+    protected int getStatCombinationCount(@NotNull Connection connection) {
+        int count = 0;
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sqlQueries.selectCount());
+            resultSet.next();
+            count = resultSet.getInt(1);
+            resultSet.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
 
     private @NotNull ArrayList<int[]> getCurrentContentsOfCombinationTable(@NotNull Connection connection) {
         ArrayList<int[]> combinations = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(SQL.StatCombinationTable.selectAll());
+            ResultSet resultSet = statement.executeQuery(sqlQueries.selectAll());
 
             while (resultSet.next()) {
                 combinations.add(
-                        new int[]{resultSet.getInt(SQL.StatCombinationTable.STAT_ID_COLUMN),
-                                resultSet.getInt(SQL.StatCombinationTable.SUB_STAT_ID_COLUMN)});
+                        new int[]{resultSet.getInt(sqlQueries.STAT_ID_COLUMN),
+                                resultSet.getInt(sqlQueries.SUB_STAT_ID_COLUMN)});
             }
             resultSet.close();
         }
@@ -51,9 +79,6 @@ public class StatCombinationDAO {
     }
 
     private @NotNull ArrayList<int[]> getAllValidCombinations(@NotNull Connection connection) {
-        StatDAO statDAO = new StatDAO();
-        SubStatDAO subStatDAO = new SubStatDAO();
-
         HashMap<Integer, MyStatistic> storedStats = statDAO.getAllStatistics(connection);
         HashMap<Integer, MySubStatistic> entitySubStats = subStatDAO.getEntitySubStats(connection);
         HashMap<Integer, MySubStatistic> itemSubStats = subStatDAO.getItemSubStats(connection);
@@ -80,7 +105,7 @@ public class StatCombinationDAO {
     }
 
     private void insert(@NotNull ArrayList<int[]> combinations, @NotNull Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(SQL.StatCombinationTable.insert())) {
+        try (PreparedStatement statement = connection.prepareStatement(sqlQueries.insert())) {
             for (int[] combination : combinations) {
                 statement.setInt(1, combination[0]);
 

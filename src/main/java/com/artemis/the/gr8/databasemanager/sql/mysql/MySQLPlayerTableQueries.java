@@ -7,7 +7,7 @@ public class MySQLPlayerTableQueries extends PlayerTableQueries {
 
     @Override
     public @NotNull String createTable() {
-        return "CREATE TABLE IF NOT EXISTS " + NAME +
+        return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME +
                 " (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY," +
                 NAME_COLUMN + " VARCHAR(16)," +

@@ -67,6 +67,10 @@ public class TestDataProvider {
         return players;
     }
 
+    public @NotNull UUID getUUIDForTzvi_() {
+        return UUID.fromString("29c0911d-695a-4c31-817f-3a065a7144b7");
+    }
+
     @Contract(" -> new")
     private @NotNull MyPlayer getTzvi_() {
         return new MyPlayer("Tzvi_", getUUIDForTzvi_(), false);
@@ -74,9 +78,5 @@ public class TestDataProvider {
 
     private @NotNull MyPlayer getTzvi_WithOldName() {
         return new MyPlayer("daboss42", getUUIDForTzvi_(), false);
-    }
-
-    protected @NotNull UUID getUUIDForTzvi_() {
-        return UUID.fromString("29c0911d-695a-4c31-817f-3a065a7144b7");
     }
 }

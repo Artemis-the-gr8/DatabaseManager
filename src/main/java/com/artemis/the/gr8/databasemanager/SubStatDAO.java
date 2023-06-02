@@ -2,7 +2,7 @@ package com.artemis.the.gr8.databasemanager;
 
 import com.artemis.the.gr8.databasemanager.models.MyStatType;
 import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
-import com.artemis.the.gr8.databasemanager.sql.SQL;
+import com.artemis.the.gr8.databasemanager.sql.SubStatTableQueries;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
@@ -13,7 +13,19 @@ import java.util.function.Predicate;
 
 public class SubStatDAO {
 
-    public SubStatDAO() {
+    private final SubStatTableQueries sqlQueries;
+
+    public SubStatDAO(SubStatTableQueries subStatTableQueries) {
+        sqlQueries = subStatTableQueries;
+    }
+
+    protected void create(@NotNull Connection connection) {
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(sqlQueries.createTable());
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void update(List<MySubStatistic> subStatistics, @NotNull Connection connection) {
@@ -27,20 +39,34 @@ public class SubStatDAO {
         }
     }
 
+    public int getAllSubStatsCount(@NotNull Connection connection) {
+        int count = 0;
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sqlQueries.selectCount());
+            resultSet.next();
+            count = resultSet.getInt(1);
+            resultSet.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
     public @NotNull HashMap<Integer, MySubStatistic> getAllSubStats(@NotNull Connection connection) {
-        return getSubStats(connection, SQL.SubStatTable.selectAll());
+        return getSubStats(connection, sqlQueries.selectAll());
     }
 
     public @NotNull HashMap<Integer, MySubStatistic> getEntitySubStats(@NotNull Connection connection) {
-        return getSubStats(connection, SQL.SubStatTable.selectEntityType());
+        return getSubStats(connection, sqlQueries.selectEntityType());
     }
 
     public @NotNull HashMap<Integer, MySubStatistic> getItemSubStats(@NotNull Connection connection) {
-        return getSubStats(connection, SQL.SubStatTable.selectItemType());
+        return getSubStats(connection, sqlQueries.selectItemType());
     }
 
     public @NotNull HashMap<Integer, MySubStatistic> getBlockSubStats(@NotNull Connection connection) {
-        return getSubStats(connection, SQL.SubStatTable.selectBlockType());
+        return getSubStats(connection, sqlQueries.selectBlockType());
     }
 
     private @NotNull HashMap<Integer, MySubStatistic> getSubStats(@NotNull Connection connection, String selectStatement) {
@@ -50,10 +76,10 @@ public class SubStatDAO {
 
             while (resultSet.next()) {
                 allStats.put(
-                        resultSet.getInt(SQL.UNIVERSAL_ID_COLUMN),
+                        resultSet.getInt(sqlQueries.ID_COLUMN),
                         new MySubStatistic(
-                                resultSet.getString(SQL.SubStatTable.NAME_COLUMN),
-                                MyStatType.fromString(resultSet.getString(SQL.SubStatTable.TYPE_COLUMN))));
+                                resultSet.getString(sqlQueries.NAME_COLUMN),
+                                MyStatType.fromString(resultSet.getString(sqlQueries.TYPE_COLUMN))));
             }
             resultSet.close();
         }
@@ -64,7 +90,7 @@ public class SubStatDAO {
     }
 
     private void insert(@NotNull List<MySubStatistic> subStats, @NotNull Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(SQL.SubStatTable.insert())) {
+        try (PreparedStatement statement = connection.prepareStatement(sqlQueries.insert())) {
             for (MySubStatistic subStat : subStats) {
                 statement.setString(1, subStat.name());
                 statement.setString(2, subStat.type().toString().toUpperCase(Locale.ENGLISH));

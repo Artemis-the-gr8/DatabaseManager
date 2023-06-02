@@ -17,7 +17,7 @@ public class PlayerDAO {
         sqlQueries = playerTableQueries;
     }
 
-    public void create(@NotNull Connection connection) {
+    protected void create(@NotNull Connection connection) {
         try (Statement statement = connection.createStatement()) {
             statement.execute(sqlQueries.createTable());
         }
@@ -49,21 +49,38 @@ public class PlayerDAO {
         }
     }
 
-    public int getPlayerID(UUID playerUUID, @NotNull Connection connection) throws NullPointerException {
+    public MyPlayer getPlayer(UUID playerUUID, @NotNull Connection connection) throws NullPointerException {
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(
-                    sqlQueries.selectIdFromUUID(playerUUID));
+                    sqlQueries.selectPlayerFromUUID(playerUUID));
 
             resultSet.next();
-            int id = resultSet.getInt(sqlQueries.ID_COLUMN);
-            resultSet.close();
+            MyPlayer player = new MyPlayer(
+                    resultSet.getString(sqlQueries.NAME_COLUMN),
+                    playerUUID,
+                    resultSet.getBoolean(sqlQueries.IS_EXCLUDED_COLUMN));
 
-            return id;
+            resultSet.close();
+            return player;
         }
         catch (SQLException e) {
             e.printStackTrace();
-            throw new NullPointerException("Something went wrong and no playerID has been found!");
+            throw new NullPointerException("Something went wrong and no player corresponding to this UUID has been found!");
         }
+    }
+
+    protected int getFullPlayerCount(@NotNull Connection connection) {
+        int count = 0;
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sqlQueries.selectCount());
+            resultSet.next();
+            count = resultSet.getInt(1);
+            resultSet.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
     }
 
     private @NotNull List<MyPlayer> getAllPlayers(@NotNull Connection connection) {

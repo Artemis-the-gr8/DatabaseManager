@@ -7,9 +7,9 @@ public class SQLitePlayerTableQueries extends PlayerTableQueries {
 
     @Override
     public @NotNull String createTable() {
-        return "CREATE TABLE IF NOT EXISTS " + NAME +
+        return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME +
                 " (" +
-                "id INT PRIMARY KEY AUTOINCREMENT," +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 NAME_COLUMN + " VARCHAR(16)," +
                 UUID_COLUMN + " VARCHAR(255)," +
                 IS_EXCLUDED_COLUMN + " BOOLEAN DEFAULT 0," +

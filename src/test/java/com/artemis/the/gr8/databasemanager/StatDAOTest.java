@@ -1,8 +1,6 @@
 package com.artemis.the.gr8.databasemanager;
 
 import com.artemis.the.gr8.databasemanager.models.MyStatistic;
-import com.artemis.the.gr8.databasemanager.sql.SQL;
-import com.artemis.the.gr8.databasemanager.testutils.TestDatabase;
 import com.artemis.the.gr8.databasemanager.utils.Timer;
 import org.junit.jupiter.api.*;
 
@@ -28,7 +26,7 @@ public class StatDAOTest extends TestDatabase {
     @Order(2)
     void checkIfTableIsEmpty() {
         Assumptions.assumeTrue(useSQLite);
-        assertEquals(0, getCountForTable(SQL.StatTable.NAME),
+        assertEquals(0, database.statDAO.getStatisticCount(connection),
                 "statistics should be empty after creation of fresh db!");
 
         System.out.println("2. Confirmed stat_table is empty");
@@ -37,15 +35,15 @@ public class StatDAOTest extends TestDatabase {
     @Test
     @Order(3)
     void insertSpigotData() {
-        StatDAO table = new StatDAO();
         List<MyStatistic> stats = testDataProvider.getAllStatsFromSpigot();
 
         Timer timer = Timer.start();
-        int before = getCountForTable(SQL.StatTable.NAME);
+        int before = database.statDAO.getStatisticCount(connection);
 
-        table.update(stats, connection);
+        database.statDAO.update(stats, connection);
+
         int expectedCount = stats.size();
-        int actualCount = getCountForTable(SQL.StatTable.NAME);
+        int actualCount = database.statDAO.getStatisticCount(connection);
 
         assertEquals(expectedCount, actualCount,
                 "db contents should equal the Spigot list!");
@@ -57,16 +55,15 @@ public class StatDAOTest extends TestDatabase {
     @Test
     @Order(4)
     void insertNewData() {
-        StatDAO table = new StatDAO();
         List<MyStatistic> stats = testDataProvider.getSomeFakeStats();
-        int oldTableSize = getCountForTable(SQL.StatTable.NAME);
+        int oldTableSize = database.statDAO.getStatisticCount(connection);
 
         Timer timer = Timer.start();
-        table.update(stats, connection);
+        database.statDAO.update(stats, connection);
         System.out.println("4. Inserted " + stats.size() + " new stats in " + timer.reset() + "ms");
 
         int expectedTableSize = oldTableSize + stats.size();
-        int actualTableSize = getCountForTable(SQL.StatTable.NAME);
+        int actualTableSize = database.statDAO.getStatisticCount(connection);
         assertEquals(expectedTableSize, actualTableSize,
                 "stats should contain " + stats.size() + " new entries!");
     }
