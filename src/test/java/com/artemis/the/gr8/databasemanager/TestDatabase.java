@@ -8,7 +8,7 @@ import java.sql.*;
 
 public class TestDatabase {
 
-    protected static final boolean useSQLite = false;
+    protected static final boolean useSQLite = true;
 
     private static String URL;
     private static String USERNAME;

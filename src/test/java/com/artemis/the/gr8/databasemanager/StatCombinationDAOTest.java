@@ -31,12 +31,20 @@ public class StatCombinationDAOTest extends TestDatabase {
     @Order(2)
     void insertCombinations() {
         Timer timer = Timer.start();
-        int before = database.statCombinationDAO.getStatCombinationCount(connection);
+        if (database.statDAO.getStatisticCount(connection) == 0) {
+            super.fillStatTableWithSpigotData();
+            System.out.println("2.1) Inserted Spigot stats in " + timer.reset() + "ms");
+        }
+        if (database.subStatDAO.getAllSubStatsCount(connection) == 0) {
+            super.fillSubStatTableWithSpigotData();
+            System.out.println("2.2) Inserted Spigot sub_stats in " + timer.reset() + "ms");
+        }
 
+        int before = database.statCombinationDAO.getStatCombinationCount(connection);
         database.statCombinationDAO.update(connection);
         int after = database.statCombinationDAO.getStatCombinationCount(connection);
-        System.out.println("2. Inserted " + (after - before) + " combinations in db in " + timer.reset() + "ms");
 
+        System.out.println("2.3) Inserted " + (after - before) + " combinations in db in " + timer.reset() + "ms");
         assertTrue(after > 0, "there should be data in stat_combinations!");
     }
 
