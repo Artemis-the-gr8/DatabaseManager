@@ -56,27 +56,34 @@ public class TestDataProvider {
         players.add(new MyPlayer("Artemis_the_gr8", UUID.fromString("46dd0c5a-2b51-4ee6-80e8-29deca6dedc1"), false));
         players.add(new MyPlayer("CyberDrain", UUID.fromString("e4c5dfef-bbcc-4012-9f74-879d28fff431"), false));
         players.add(new MyPlayer("Ridimas", UUID.fromString("8fb811dc-2ceb-4528-9951-cf803e0550a1"), false));
-        players.add(getTzvi_());
+        players.add(getTz());
         return players;
     }
 
     public @NotNull List<MyPlayer> getSameFakePlayersWithOneNewName() {
         List<MyPlayer> players = getSomeFakePlayers();
-        players.remove(getTzvi_());
-        players.add(getTzvi_WithOldName());
+        players.remove(getTz());
+        players.add(getTzWithOldName());
         return players;
     }
 
-    public @NotNull UUID getUUIDForTzvi_() {
+    public @NotNull MyPlayer getNewRandomlyGeneratedPlayer() {
+        Random random = new Random();
+        String name = "test" + random.nextInt(999999999);
+        UUID uuid = UUID.randomUUID();
+        return new MyPlayer(name, uuid, false);
+    }
+
+    public @NotNull UUID getUUIDForTz() {
         return UUID.fromString("29c0911d-695a-4c31-817f-3a065a7144b7");
     }
 
     @Contract(" -> new")
-    private @NotNull MyPlayer getTzvi_() {
-        return new MyPlayer("Tzvi_", getUUIDForTzvi_(), false);
+    private @NotNull MyPlayer getTz() {
+        return new MyPlayer("Tzvi_", getUUIDForTz(), false);
     }
 
-    private @NotNull MyPlayer getTzvi_WithOldName() {
-        return new MyPlayer("daboss42", getUUIDForTzvi_(), false);
+    private @NotNull MyPlayer getTzWithOldName() {
+        return new MyPlayer("daboss42", getUUIDForTz(), false);
     }
 }

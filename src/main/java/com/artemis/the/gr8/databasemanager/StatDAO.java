@@ -28,7 +28,7 @@ public class StatDAO {
         }
     }
 
-    public void update(List<MyStatistic> statistics, Connection connection) {
+    public void update(List<MyStatistic> statistics, @NotNull Connection connection) {
         if (statistics != null) {
             List<MyStatistic> currentlyStored = getAllStatistics(connection).values().stream().toList();
             List<MyStatistic> newValues = statistics.stream()
@@ -36,6 +36,20 @@ public class StatDAO {
 
             insert(newValues, connection);
         }
+    }
+
+    public int getStatisticID(String statName, @NotNull Connection connection) {
+        int id = 0;
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sqlQueries.selectIdFromName(statName));
+            resultSet.next();
+            id = resultSet.getInt(1);
+            resultSet.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
     }
 
     public int getStatisticCount(@NotNull Connection connection) {

@@ -14,14 +14,6 @@ public abstract class PlayerTableQueries {
 
     public abstract @NotNull String createTable();
 
-    public @NotNull String selectAll() {
-        return "SELECT * FROM " + TABLE_NAME + ";";
-    }
-
-    public @NotNull String selectCount() {
-        return "SELECT COUNT(*) FROM " + TABLE_NAME + ";";
-    }
-
     public @NotNull String selectIdFromUUID(@NotNull UUID uuid) {
         return "SELECT " + ID_COLUMN + " FROM " + TABLE_NAME +
                 " WHERE " + UUID_COLUMN + " = '" + uuid + "';";
@@ -30,6 +22,14 @@ public abstract class PlayerTableQueries {
     public @NotNull String selectPlayerFromUUID(@NotNull UUID uuid) {
         return "SELECT * FROM " + TABLE_NAME +
                 " WHERE " + UUID_COLUMN + " = '" + uuid + "';";
+    }
+
+    public @NotNull String selectCount() {
+        return "SELECT COUNT(*) FROM " + TABLE_NAME + ";";
+    }
+
+    public @NotNull String selectAll() {
+        return "SELECT * FROM " + TABLE_NAME + ";";
     }
 
     public @NotNull String insert() {

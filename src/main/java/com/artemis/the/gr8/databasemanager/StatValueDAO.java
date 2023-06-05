@@ -12,9 +12,13 @@ import java.util.UUID;
 
 public class StatValueDAO {
 
+    private final PlayerDAO playerDAO;
+    private final StatCombinationDAO statCombinationDAO;
     private final StatValueTableQueries sqlQueries;
 
-    public StatValueDAO(StatValueTableQueries statValueTableQueries) {
+    public StatValueDAO(PlayerDAO playerDAO, StatCombinationDAO statCombinationDAO, StatValueTableQueries statValueTableQueries) {
+        this.playerDAO = playerDAO;
+        this.statCombinationDAO = statCombinationDAO;
         sqlQueries = statValueTableQueries;
     }
 
@@ -27,7 +31,8 @@ public class StatValueDAO {
         }
     }
 
-    public void updateCustomStatTypeForPlayer(UUID playerUUID, HashMap<MyStatistic, Integer> values, Connection connection) {
+    public void updateCustomStatTypeForPlayer(UUID uuid, HashMap<MyStatistic, Integer> values, Connection connection) {
+        int playerID = playerDAO.getPlayerID(uuid, connection);
 
     }
 }

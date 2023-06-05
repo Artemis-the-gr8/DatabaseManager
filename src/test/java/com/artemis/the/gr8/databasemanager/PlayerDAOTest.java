@@ -4,6 +4,7 @@ import com.artemis.the.gr8.databasemanager.models.MyPlayer;
 import com.artemis.the.gr8.databasemanager.utils.Timer;
 import org.junit.jupiter.api.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -30,17 +31,34 @@ public class PlayerDAOTest extends TestDatabase {
 
     @Test
     @Order(2)
-    void updateNameForExistingTzvi_Entry() {
+    void updateNameForExistingTzEntry() {
         List<MyPlayer> players = testDataProvider.getSameFakePlayersWithOneNewName();
-        String currentName = database.playerDAO.getPlayer(
-                testDataProvider.getUUIDForTzvi_(), connection).playerName();
+        MyPlayer currentTz = database.playerDAO.getPlayer(testDataProvider.getUUIDForTz(), connection);
+        Assertions.assertNotNull(currentTz);
+        String currentTzName = currentTz.playerName();
 
         Timer timer = Timer.start();
         database.playerDAO.update(players, connection);
-        String newName = database.playerDAO.getPlayer(
-                testDataProvider.getUUIDForTzvi_(), connection).playerName();
+        MyPlayer newTz = database.playerDAO.getPlayer(testDataProvider.getUUIDForTz(), connection);
+        Assertions.assertNotNull(newTz);
+        String newTzName = newTz.playerName();
 
-        Assertions.assertNotEquals(currentName, newName, "Tzvi_'s name should have updated!");
-        System.out.println("2. Changed playerName from " + currentName + " to " + newName + " in " + timer.reset() + "ms");
+        Assertions.assertNotEquals(currentTzName, newTzName, "Tz's name should have updated!");
+        System.out.println("2. Changed playerName from " + currentTzName + " to " + newTzName + " in " + timer.reset() + "ms");
+    }
+
+    @Test
+    @Order(3)
+    void getPlayerID() {
+        int currentTableContents = database.playerDAO.getFullPlayerCount(connection);
+        List<MyPlayer> newPlayerList = new ArrayList<>();
+
+        MyPlayer newPlayer = testDataProvider.getNewRandomlyGeneratedPlayer();
+        newPlayerList.add(newPlayer);
+        database.playerDAO.update(newPlayerList, connection);
+
+        int newlyInsertedPlayerId = database.playerDAO.getPlayerID(newPlayer.playerUUID(), connection);
+        System.out.println("3. Inserted new player and confirmed id auto-incremented");
+        Assertions.assertEquals(currentTableContents + 1, newlyInsertedPlayerId, "id should have auto-incremented!");
     }
 }

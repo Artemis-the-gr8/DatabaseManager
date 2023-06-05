@@ -17,11 +17,19 @@ public abstract class StatCombinationTableQueries {
                 SUB_STAT_ID_COLUMN + ") VALUES (?, ?);";
     }
 
-    public @NotNull String selectAll() {
-        return "SELECT * FROM " + TABLE_NAME + ";";
+    public @NotNull String selectIdFromStatAndSubStatId(int statId, int subStatId) {
+        String subStatCondition = subStatId == 0 ? " IS NULL" : " = " + subStatId;
+
+        return "SELECT " + ID_COLUMN + " FROM " + TABLE_NAME +
+                " WHERE " + STAT_ID_COLUMN + " = " + statId +
+                " AND " + SUB_STAT_ID_COLUMN + subStatCondition + ";";
     }
 
     public @NotNull String selectCount() {
         return "SELECT COUNT(*) FROM " + TABLE_NAME + ";";
+    }
+
+    public @NotNull String selectAll() {
+        return "SELECT * FROM " + TABLE_NAME + ";";
     }
 }

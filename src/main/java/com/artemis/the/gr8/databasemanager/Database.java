@@ -37,7 +37,7 @@ public class Database {
         database.statDAO = new StatDAO(new MySQLStatTableQueries());
         database.subStatDAO = new SubStatDAO(new MySQLSubStatTableQueries());
         database.statCombinationDAO = new StatCombinationDAO(database.statDAO, database.subStatDAO, new MySQLStatCombinationTableQueries());
-        database.statValueDAO = new StatValueDAO(new MySQLStatValueTableQueries());
+        database.statValueDAO = new StatValueDAO(database.playerDAO, database.statCombinationDAO, new MySQLStatValueTableQueries());
 
         return database;
     }
@@ -48,7 +48,7 @@ public class Database {
         database.statDAO = new StatDAO(new SQLiteStatTableQueries());
         database.subStatDAO = new SubStatDAO(new SQLiteSubStatTableQueries());
         database.statCombinationDAO = new StatCombinationDAO(database.statDAO, database.subStatDAO, new SQLiteStatCombinationTableQueries());
-        database.statValueDAO = new StatValueDAO(new SQLiteStatValueTableQueries());
+        database.statValueDAO = new StatValueDAO(database.playerDAO, database.statCombinationDAO, new SQLiteStatValueTableQueries());
 
         return database;
     }

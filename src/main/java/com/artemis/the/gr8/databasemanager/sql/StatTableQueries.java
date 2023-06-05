@@ -12,12 +12,17 @@ public abstract class StatTableQueries {
 
     public abstract @NotNull String createTable();
 
-    public @NotNull String selectAll() {
-        return "SELECT * FROM " + TABLE_NAME + ";";
+    public @NotNull String selectIdFromName(String statName) {
+        return "SELECT " + ID_COLUMN + " FROM " + TABLE_NAME +
+                " WHERE " + NAME_COLUMN + " = '" + statName + "';";
     }
 
     public @NotNull String selectCount() {
         return "SELECT COUNT(*) FROM " + TABLE_NAME + ";";
+    }
+
+    public @NotNull String selectAll() {
+        return "SELECT * FROM " + TABLE_NAME + ";";
     }
 
     @Contract(pure = true)

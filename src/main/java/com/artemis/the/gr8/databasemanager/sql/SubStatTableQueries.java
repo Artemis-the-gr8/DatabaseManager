@@ -20,12 +20,17 @@ public abstract class SubStatTableQueries {
                 TYPE_COLUMN + ") VALUES (?, ?);";
     }
 
-    public @NotNull String selectAll() {
-        return "SELECT * FROM " + TABLE_NAME + ";";
+    public @NotNull String selectIdFromName(String subStatName) {
+        return "SELECT " + ID_COLUMN + " FROM " + TABLE_NAME +
+                " WHERE " + NAME_COLUMN + " = '" + subStatName + "';";
     }
 
     public @NotNull String selectCount() {
         return "SELECT COUNT(*) FROM " + TABLE_NAME + ";";
+    }
+
+    public @NotNull String selectAll() {
+        return "SELECT * FROM " + TABLE_NAME + ";";
     }
 
     public @NotNull String selectEntityType() {

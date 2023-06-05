@@ -3,6 +3,7 @@ package com.artemis.the.gr8.databasemanager;
 import com.artemis.the.gr8.databasemanager.models.MyPlayer;
 import com.artemis.the.gr8.databasemanager.sql.PlayerTableQueries;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -49,24 +50,38 @@ public class PlayerDAO {
         }
     }
 
-    public MyPlayer getPlayer(UUID playerUUID, @NotNull Connection connection) throws NullPointerException {
+    public int getPlayerID(UUID uuid, @NotNull Connection connection) {
+        int id = 0;
         try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(
-                    sqlQueries.selectPlayerFromUUID(playerUUID));
-
+            ResultSet resultSet = statement.executeQuery(sqlQueries.selectIdFromUUID(uuid));
             resultSet.next();
-            MyPlayer player = new MyPlayer(
-                    resultSet.getString(sqlQueries.NAME_COLUMN),
-                    playerUUID,
-                    resultSet.getBoolean(sqlQueries.IS_EXCLUDED_COLUMN));
-
+            id = resultSet.getInt(1);
             resultSet.close();
-            return player;
         }
         catch (SQLException e) {
             e.printStackTrace();
-            throw new NullPointerException("Something went wrong and no player corresponding to this UUID has been found!");
         }
+        return id;
+    }
+
+    public @Nullable MyPlayer getPlayer(UUID uuid, @NotNull Connection connection) {
+        MyPlayer player = null;
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(
+                    sqlQueries.selectPlayerFromUUID(uuid));
+
+            resultSet.next();
+            player = new MyPlayer(
+                    resultSet.getString(sqlQueries.NAME_COLUMN),
+                    uuid,
+                    resultSet.getBoolean(sqlQueries.IS_EXCLUDED_COLUMN));
+
+            resultSet.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return player;
     }
 
     protected int getFullPlayerCount(@NotNull Connection connection) {

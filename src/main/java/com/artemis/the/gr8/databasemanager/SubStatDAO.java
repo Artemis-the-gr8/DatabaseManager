@@ -39,6 +39,20 @@ public class SubStatDAO {
         }
     }
 
+    public int getSubStatId(String subStatName, @NotNull Connection connection) {
+        int id = 0;
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sqlQueries.selectIdFromName(subStatName));
+            resultSet.next();
+            id = resultSet.getInt(1);
+            resultSet.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
+
     public int getAllSubStatsCount(@NotNull Connection connection) {
         int count = 0;
         try (Statement statement = connection.createStatement()) {

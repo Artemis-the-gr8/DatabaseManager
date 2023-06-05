@@ -46,6 +46,22 @@ public class StatCombinationDAO {
         insert(newValues, connection);
     }
 
+    public int getStatCombinationID(@NotNull MyStatistic statistic, MySubStatistic subStatistic, Connection connection) {
+        int statId = statDAO.getStatisticID(statistic.name(), connection);
+        int subStatId = subStatistic == null ? 0 : subStatDAO.getSubStatId(subStatistic.name(), connection);
+        int statCombinationId = 0;
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sqlQueries.selectIdFromStatAndSubStatId(statId, subStatId));
+            resultSet.next();
+            statCombinationId = resultSet.getInt(1);
+            resultSet.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return statCombinationId;
+    }
+
     protected int getStatCombinationCount(@NotNull Connection connection) {
         int count = 0;
         try (Statement statement = connection.createStatement()) {

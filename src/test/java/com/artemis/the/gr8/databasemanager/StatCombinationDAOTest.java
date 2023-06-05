@@ -1,5 +1,8 @@
 package com.artemis.the.gr8.databasemanager;
 
+import com.artemis.the.gr8.databasemanager.models.MyStatType;
+import com.artemis.the.gr8.databasemanager.models.MyStatistic;
+import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
 import com.artemis.the.gr8.databasemanager.utils.Timer;
 import org.junit.jupiter.api.*;
 
@@ -60,5 +63,15 @@ public class StatCombinationDAOTest extends TestDatabase {
         System.out.println("3.2) " + (after - before) + " entries added (" + timer.reset() + "ms)");
 
         assertEquals(0, (after - before), "stat_combinations should have no new entries!");
+    }
+
+    @Test
+    @Order(4)
+    void getStatCombinationId() {
+        int id = database.statCombinationDAO.getStatCombinationID(
+                new MyStatistic("kill_entity", MyStatType.ENTITY),
+                new MySubStatistic("zombie", MyStatType.ENTITY),
+                connection);
+        System.out.println("4. id of kill_entity zombie should be 9523, and is: " + id);
     }
 }
