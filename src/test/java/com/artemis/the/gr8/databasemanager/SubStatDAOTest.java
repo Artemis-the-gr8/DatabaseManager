@@ -35,7 +35,6 @@ public class SubStatDAOTest extends TestDatabase {
     @Order(3)
     void insertSpigotData() {
         List<MySubStatistic> subStats = testDataProvider.getAllSubStatsFromSpigot();
-
         Timer timer = Timer.start();
 
         int initialCount = database.subStatDAO.getAllSubStatsCount(connection);

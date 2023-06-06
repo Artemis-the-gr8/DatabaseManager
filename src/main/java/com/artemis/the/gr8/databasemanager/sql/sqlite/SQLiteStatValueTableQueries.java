@@ -17,7 +17,11 @@ public class SQLiteStatValueTableQueries extends StatValueTableQueries {
                 "FOREIGN KEY (" + PLAYER_ID_COLUMN + ") REFERENCES " +
                 PlayerTableQueries.TABLE_NAME + "(id)," +
                 "FOREIGN KEY (" + STAT_COMBINATION_ID_COLUMN + ") REFERENCES " +
-                StatCombinationTableQueries.TABLE_NAME + "(id)" +
+                StatCombinationTableQueries.TABLE_NAME + "(id)," +
+                "CONSTRAINT unique_player_value_combination UNIQUE (" +
+                PLAYER_ID_COLUMN + ", " +
+                STAT_COMBINATION_ID_COLUMN +
+                ")" +
                 ");";
     }
 }

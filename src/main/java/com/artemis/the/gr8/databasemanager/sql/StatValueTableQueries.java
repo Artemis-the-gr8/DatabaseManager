@@ -11,4 +11,10 @@ public abstract class StatValueTableQueries {
 
     public abstract @NotNull String createTable();
 
+    public @NotNull String insert() {
+        return "INSERT INTO " + TABLE_NAME + " (" +
+                PLAYER_ID_COLUMN + ", " +
+                STAT_COMBINATION_ID_COLUMN + ", " +
+                VALUE_COLUMN + ") VALUES (?, ?, ?);";
+    }
 }

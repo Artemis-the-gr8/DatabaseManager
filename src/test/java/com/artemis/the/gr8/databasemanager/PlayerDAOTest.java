@@ -32,14 +32,14 @@ public class PlayerDAOTest extends TestDatabase {
     @Test
     @Order(2)
     void updateNameForExistingTzEntry() {
-        List<MyPlayer> players = testDataProvider.getSameFakePlayersWithOneNewName();
-        MyPlayer currentTz = database.playerDAO.getPlayer(testDataProvider.getUUIDForTz(), connection);
+        List<MyPlayer> players = testDataProvider.getSomeFakePlayersWithOldTzName();
+        MyPlayer currentTz = database.playerDAO.getPlayer(testDataProvider.getTz().uuid(), connection);
         Assertions.assertNotNull(currentTz);
         String currentTzName = currentTz.playerName();
 
         Timer timer = Timer.start();
         database.playerDAO.update(players, connection);
-        MyPlayer newTz = database.playerDAO.getPlayer(testDataProvider.getUUIDForTz(), connection);
+        MyPlayer newTz = database.playerDAO.getPlayer(testDataProvider.getTz().uuid(), connection);
         Assertions.assertNotNull(newTz);
         String newTzName = newTz.playerName();
 
@@ -57,7 +57,7 @@ public class PlayerDAOTest extends TestDatabase {
         newPlayerList.add(newPlayer);
         database.playerDAO.update(newPlayerList, connection);
 
-        int newlyInsertedPlayerId = database.playerDAO.getPlayerID(newPlayer.playerUUID(), connection);
+        int newlyInsertedPlayerId = database.playerDAO.getPlayerID(newPlayer.uuid(), connection);
         System.out.println("3. Inserted new player and confirmed id auto-incremented");
         Assertions.assertEquals(currentTableContents + 1, newlyInsertedPlayerId, "id should have auto-incremented!");
     }

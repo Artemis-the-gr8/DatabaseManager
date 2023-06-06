@@ -31,13 +31,13 @@ public class PlayerDAO {
         if (players != null) {
             List<UUID> currentlyStored = getAllPlayers(connection)
                     .stream()
-                    .map(MyPlayer::playerUUID)
+                    .map(MyPlayer::uuid)
                     .toList();
             List<MyPlayer> overlappingValues = new ArrayList<>();
             List<MyPlayer> newValues = new ArrayList<>();
 
             players.forEach(myPlayer -> {
-                if (currentlyStored.contains(myPlayer.playerUUID())) {
+                if (currentlyStored.contains(myPlayer.uuid())) {
                     overlappingValues.add(myPlayer);
                 }
                 else {
@@ -123,7 +123,7 @@ public class PlayerDAO {
             for (MyPlayer player : players) {
                 statement.setString(1, player.playerName());
                 statement.setBoolean(2, player.isExcluded());
-                statement.setString(3, player.playerUUID().toString());
+                statement.setString(3, player.uuid().toString());
                 statement.addBatch();
             }
             statement.executeBatch();
@@ -137,7 +137,7 @@ public class PlayerDAO {
         try (PreparedStatement statement = connection.prepareStatement(sqlQueries.insert())) {
             for (MyPlayer player : players) {
                 statement.setString(1, player.playerName());
-                statement.setString(2, player.playerUUID().toString());
+                statement.setString(2, player.uuid().toString());
                 statement.setBoolean(3, player.isExcluded());
                 statement.addBatch();
             }

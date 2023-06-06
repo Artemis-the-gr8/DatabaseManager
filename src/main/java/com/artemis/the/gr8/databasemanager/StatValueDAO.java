@@ -5,9 +5,11 @@ import com.artemis.the.gr8.databasemanager.sql.StatValueTableQueries;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class StatValueDAO {
@@ -31,8 +33,29 @@ public class StatValueDAO {
         }
     }
 
-    public void updateCustomStatTypeForPlayer(UUID uuid, HashMap<MyStatistic, Integer> values, Connection connection) {
+    public void updateCustomStatTypeForPlayer(UUID uuid, @NotNull HashMap<MyStatistic, Integer> values, Connection connection) {
         int playerID = playerDAO.getPlayerID(uuid, connection);
+        HashMap<Integer, Integer> valuesWithId = new HashMap<>();
 
+        values.forEach((stat, value) ->
+                valuesWithId.put(
+                        statCombinationDAO.getStatCombinationID(stat, null, connection),
+                        value));
+        insert(playerID, valuesWithId, connection);
+    }
+
+    private void insert(int playerId, @NotNull HashMap<Integer, Integer> values, @NotNull Connection connection) {
+        try (PreparedStatement statement = connection.prepareStatement(sqlQueries.insert())) {
+            for (Map.Entry<Integer, Integer> entry : values.entrySet()) {
+                statement.setInt(1, playerId);
+                statement.setInt(2, entry.getKey());
+                statement.setInt(3, entry.getValue());
+                statement.addBatch();
+            }
+            statement.executeBatch();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
