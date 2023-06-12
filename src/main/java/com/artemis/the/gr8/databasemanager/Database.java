@@ -54,16 +54,6 @@ public class Database {
         }
     }
 
-    protected HashMap<Integer, MyStatistic> getAllStatistics() {
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            return statDAO.getAllStatistics(connection);
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-            throw new NullPointerException("Getting all statistics has failed!");
-        }
-    }
-
     public void updatePlayers(List<MyPlayer> players) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             playerDAO.update(players, connection);

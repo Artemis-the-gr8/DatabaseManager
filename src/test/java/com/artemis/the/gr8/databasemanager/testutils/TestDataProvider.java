@@ -50,6 +50,10 @@ public class TestDataProvider {
         return subStats;
     }
 
+    public @NotNull MyStatistic getEntityTypeStatFromSpigot() {
+        return new MyStatistic(Statistic.KILL_ENTITY.toString().toLowerCase(Locale.ENGLISH), MyStatType.ENTITY);
+    }
+
     public @NotNull List<MyPlayer> getSomeFakePlayers() {
         List<MyPlayer> players = new ArrayList<>();
         players.add(getArtemis());

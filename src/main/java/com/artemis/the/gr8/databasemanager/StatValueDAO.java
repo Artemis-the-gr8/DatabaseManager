@@ -1,6 +1,7 @@
 package com.artemis.the.gr8.databasemanager;
 
 import com.artemis.the.gr8.databasemanager.models.MyStatistic;
+import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
 import com.artemis.the.gr8.databasemanager.sql.StatValueTableQueries;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,19 +34,75 @@ public class StatValueDAO {
         }
     }
 
-    public void updateCustomStatTypeForPlayer(UUID uuid, @NotNull HashMap<MyStatistic, Integer> values, Connection connection) {
-        int playerID = playerDAO.getPlayerID(uuid, connection);
-        HashMap<Integer, Integer> valuesWithId = new HashMap<>();
+    /** For the given player, update the values in the database
+     * for all provided statistics.
+     * @param playerUUID the UUID of the player whose statistics should be updated
+     * @param values a <code>HashMap</code> with statistic-value pairs
+     *               for all statistics that should be updated
+     *               (for example "animals_bred, 20)
+     */
+    public void updateStatsForPlayer(UUID playerUUID, @NotNull HashMap<MyStatistic, Integer> values, Connection connection) {
+        int playerID = playerDAO.getPlayerID(playerUUID, connection);
+        HashMap<Integer, Integer> valuesWithID = new HashMap<>();
 
         values.forEach((stat, value) ->
-                valuesWithId.put(
+                valuesWithID.put(
                         statCombinationDAO.getStatCombinationID(stat, null, connection),
                         value));
-        insert(playerID, valuesWithId, connection);
+        insert(playerID, valuesWithID, connection);
     }
 
-    public void updateStatWithSubStatTypeForPlayer() {
+    /**
+     * For the given player and the given statistic (of type ENTITY),
+     * update the values in the database for all provided entities.
+     * @param playerUUID the UUID of the player whose statistics should be updated
+     * @param entityTypeStat a statistic of type ENTITY
+     *                       (for example "kill_entity")
+     * @param values a <code>HashMap</code> with substatistic-value pairs for all
+     *               substatistics that should be updated
+     *               (for example "zombie, 15")
+     */
+    public void updateEntityStatForPlayer(UUID playerUUID, MyStatistic entityTypeStat, @NotNull HashMap<MySubStatistic, Integer> values, Connection connection) {
+        updateStatWithSubStatForPlayer(playerUUID, entityTypeStat, values, connection);
+    }
 
+    /**
+     * For the given player and the given statistic (of type BLOCK),
+     * update the values in the database for all provided blocks.
+     * @param playerUUID the UUID of the player whose statistics should be updated
+     * @param blockTypeStat a statistic of type BLOCK
+     *                       (for example "mine_block")
+     * @param values a <code>HashMap</code> with substatistic-value pairs for all
+     *               substatistics that should be updated
+     *               (for example "stone, 15")
+     */
+    public void updateBlockStatForPlayer(UUID playerUUID, MyStatistic blockTypeStat, @NotNull HashMap<MySubStatistic, Integer> values, Connection connection) {
+        updateStatWithSubStatForPlayer(playerUUID, blockTypeStat, values, connection);
+    }
+
+    /**
+     * For the given player and the given statistic (of type ITEM),
+     * update the values in the database for all provided items.
+     * @param playerUUID the UUID of the player whose statistics should be updated
+     * @param itemTypeStat a statistic of type ITEM
+     *                       (for example "craft_item")
+     * @param values a <code>HashMap</code> with substatistic-value pairs for all
+     *               substatistics that should be updated
+     *               (for example "birch_boat, 15")
+     */
+    public void updateItemStatForPlayer(UUID playerUUID, MyStatistic itemTypeStat, @NotNull HashMap<MySubStatistic, Integer> values, Connection connection) {
+        updateStatWithSubStatForPlayer(playerUUID, itemTypeStat, values, connection);
+    }
+
+    private void updateStatWithSubStatForPlayer(UUID uuid, MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values, Connection connection) {
+        int playerID = playerDAO.getPlayerID(uuid, connection);
+        HashMap<Integer, Integer> valuesWithID = new HashMap<>();
+
+        values.forEach((subStat, value) ->
+                valuesWithID.put(
+                        statCombinationDAO.getStatCombinationID(statistic, subStat, connection),
+                        value));
+        insert(playerID, valuesWithID, connection);
     }
 
     private void insert(int playerId, @NotNull HashMap<Integer, Integer> values, @NotNull Connection connection) {
