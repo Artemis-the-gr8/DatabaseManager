@@ -33,28 +33,14 @@ public class Database {
 
     public static @NotNull Database getMySQLDatabase(String URL, String userName, String password) {
         Database database = new Database(URL, userName, password);
-        database.playerDAO = new PlayerDAO(new MySQLPlayerTableQueries());
-        database.statDAO = new StatDAO(new MySQLStatTableQueries());
-        database.subStatDAO = new SubStatDAO(new MySQLSubStatTableQueries());
-        database.statCombinationDAO = new StatCombinationDAO(database.statDAO, database.subStatDAO, new MySQLStatCombinationTableQueries());
-        database.statValueDAO = new StatValueDAO(database.playerDAO, database.statCombinationDAO, new MySQLStatValueTableQueries());
-
+        database.setUpMySQL();
         return database;
     }
 
     public static @NotNull Database getSQLiteDatabase(String URL) {
         Database database = new Database(URL, null, null);
-        database.playerDAO = new PlayerDAO(new SQLitePlayerTableQueries());
-        database.statDAO = new StatDAO(new SQLiteStatTableQueries());
-        database.subStatDAO = new SubStatDAO(new SQLiteSubStatTableQueries());
-        database.statCombinationDAO = new StatCombinationDAO(database.statDAO, database.subStatDAO, new SQLiteStatCombinationTableQueries());
-        database.statValueDAO = new StatValueDAO(database.playerDAO, database.statCombinationDAO, new SQLiteStatValueTableQueries());
-
+        database.setUpSQLite();
         return database;
-    }
-
-    public void setUp() {
-        createTablesIfNotExisting();
     }
 
     public void updateStatistics(List<MyStatistic> statistics, List<MySubStatistic> subStatistics) {
@@ -85,6 +71,26 @@ public class Database {
         catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private void setUpMySQL() {
+        playerDAO = new PlayerDAO(new MySQLPlayerTableQueries());
+        statDAO = new StatDAO(new MySQLStatTableQueries());
+        subStatDAO = new SubStatDAO(new MySQLSubStatTableQueries());
+        statCombinationDAO = new StatCombinationDAO(statDAO, subStatDAO, new MySQLStatCombinationTableQueries());
+        statValueDAO = new StatValueDAO(playerDAO, statCombinationDAO, new MySQLStatValueTableQueries());
+
+        createTablesIfNotExisting();
+    }
+
+    private void setUpSQLite() {
+        playerDAO = new PlayerDAO(new SQLitePlayerTableQueries());
+        statDAO = new StatDAO(new SQLiteStatTableQueries());
+        subStatDAO = new SubStatDAO(new SQLiteSubStatTableQueries());
+        statCombinationDAO = new StatCombinationDAO(statDAO, subStatDAO, new SQLiteStatCombinationTableQueries());
+        statValueDAO = new StatValueDAO(playerDAO, statCombinationDAO, new SQLiteStatValueTableQueries());
+
+        createTablesIfNotExisting();
     }
 
     private void createTablesIfNotExisting() {

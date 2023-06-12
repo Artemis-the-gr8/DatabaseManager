@@ -6,7 +6,7 @@ import org.junit.jupiter.api.*;
 import java.io.File;
 import java.sql.*;
 
-public class TestDatabase {
+public class TestDatabaseHandler {
 
     protected static final boolean useSQLite = false;
 
@@ -38,8 +38,6 @@ public class TestDatabase {
 
             database = Database.getMySQLDatabase(URL, USERNAME, PASSWORD);
         }
-
-        database.setUp();
     }
 
     @BeforeEach

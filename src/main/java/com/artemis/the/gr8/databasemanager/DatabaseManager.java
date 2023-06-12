@@ -10,17 +10,13 @@ public class DatabaseManager {
 
     @Contract("_, _, _ -> new")
     public static @NotNull Database getMySQLManager(String URL, String username, String password) {
-        Database database = Database.getMySQLDatabase(URL, username, password);
-        database.setUp();
-        return database;
+        return Database.getMySQLDatabase(URL, username, password);
     }
 
     public static @NotNull Database getSQLiteManager(@NotNull File pluginDataFolder) {
         String URL = "jdbc:sqlite:" +
                 pluginDataFolder.getPath() +
                 "/stats.db";
-        Database database = Database.getSQLiteDatabase(URL);
-        database.setUp();
-        return database;
+        return Database.getSQLiteDatabase(URL);
     }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class SubStatDAOTest extends TestDatabase {
+public class SubStatDAOTest extends TestDatabaseHandler {
 
     @Test
     @Order(1)

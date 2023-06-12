@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class PlayerDAOTest extends TestDatabase {
+public class PlayerDAOTest extends TestDatabaseHandler {
 
     @Test
     @Order(1)

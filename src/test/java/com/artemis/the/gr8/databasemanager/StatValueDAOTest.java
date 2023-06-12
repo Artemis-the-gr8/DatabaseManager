@@ -14,7 +14,7 @@ import java.util.Random;
 import java.util.UUID;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class StatValueDAOTest extends TestDatabase {
+public class StatValueDAOTest extends TestDatabaseHandler {
 
     @Test
     @Order(1)

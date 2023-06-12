@@ -44,6 +44,10 @@ public class StatValueDAO {
         insert(playerID, valuesWithId, connection);
     }
 
+    public void updateStatWithSubStatTypeForPlayer() {
+
+    }
+
     private void insert(int playerId, @NotNull HashMap<Integer, Integer> values, @NotNull Connection connection) {
         try (PreparedStatement statement = connection.prepareStatement(sqlQueries.insert())) {
             for (Map.Entry<Integer, Integer> entry : values.entrySet()) {
