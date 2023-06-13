@@ -20,9 +20,23 @@ public abstract class SubStatTableQueries {
                 TYPE_COLUMN + ") VALUES (?, ?);";
     }
 
-    public @NotNull String selectIdFromName(String subStatName) {
+    public @NotNull String selectEntityIdFromName(String subStatName) {
+        return selectIdFromName(subStatName, MyStatType.ENTITY);
+    }
+
+    public @NotNull String selectBlockIdFromName(String subStatName) {
+        return selectIdFromName(subStatName, MyStatType.BLOCK);
+    }
+
+    public @NotNull String selectItemIdFromName(String subStatName) {
+        return selectIdFromName(subStatName, MyStatType.ITEM);
+    }
+
+    @Contract(pure = true)
+    private @NotNull String selectIdFromName(String subStatName, @NotNull MyStatType type) {
         return "SELECT " + ID_COLUMN + " FROM " + TABLE_NAME +
-                " WHERE " + NAME_COLUMN + " = '" + subStatName + "';";
+                " WHERE " + NAME_COLUMN + " = '" + subStatName + "' " +
+                "AND " + TYPE_COLUMN + " = '" + type.getName() + "';";
     }
 
     public @NotNull String selectCount() {

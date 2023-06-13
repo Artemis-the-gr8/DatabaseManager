@@ -48,7 +48,7 @@ public class StatCombinationDAO {
 
     public int getStatCombinationID(@NotNull MyStatistic statistic, MySubStatistic subStatistic, Connection connection) {
         int statId = statDAO.getStatisticID(statistic.name(), connection);
-        int subStatId = subStatistic == null ? 0 : subStatDAO.getSubStatId(subStatistic.name(), connection);
+        int subStatId = subStatistic == null ? 0 : subStatDAO.getSubStatId(subStatistic, connection);
         int statCombinationId = 0;
 
         try (Statement statement = connection.createStatement()) {
@@ -62,6 +62,13 @@ public class StatCombinationDAO {
         }
         catch (SQLException e) {
             e.printStackTrace();
+        }
+        if (statCombinationId == 0) {
+            if (subStatistic == null) {
+                System.out.println("Couldn't find combination-id for " + statistic.name() + "!");
+            } else {
+                System.out.println("Couldn't find combination-id for " + statistic.name() + " (id: " + statId + ") and " + subStatistic.name() + "(id: " + subStatId + ")!");
+            }
         }
         return statCombinationId;
     }

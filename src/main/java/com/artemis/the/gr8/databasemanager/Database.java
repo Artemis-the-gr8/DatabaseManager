@@ -5,14 +5,13 @@ import com.artemis.the.gr8.databasemanager.models.MyStatistic;
 import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
 import com.artemis.the.gr8.databasemanager.sql.mysql.*;
 import com.artemis.the.gr8.databasemanager.sql.sqlite.*;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.*;
 
-/**
- * Responsible for all connections with databases
- */
+@ApiStatus.Internal
 public class Database implements DatabaseManager {
 
     private final String URL;
@@ -43,6 +42,7 @@ public class Database implements DatabaseManager {
         return database;
     }
 
+    @Override
     public void updateStatistics(List<MyStatistic> statistics, List<MySubStatistic> subStatistics) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             statDAO.update(statistics, connection);
@@ -54,9 +54,45 @@ public class Database implements DatabaseManager {
         }
     }
 
+    @Override
     public void updatePlayers(List<MyPlayer> players) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             playerDAO.update(players, connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void updateStatsForPlayer(MyPlayer player, @NotNull HashMap<MyStatistic, Integer> values) {
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            statValueDAO.updateStatsForPlayer(player, values, connection);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void updateEntityStatForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values) {
+        updateStatWithSubStatForPlayer(player, statistic, values);
+    }
+
+    @Override
+    public void updateItemStatForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values) {
+        updateStatWithSubStatForPlayer(player, statistic, values);
+    }
+
+    @Override
+    public void updateBlockStatForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values) {
+        updateStatWithSubStatForPlayer(player, statistic, values);
+    }
+
+    private void updateStatWithSubStatForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values) {
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            statValueDAO.updateStatWithSubStatForPlayer(
+                    player, statistic, values, connection);
         }
         catch (SQLException e) {
             e.printStackTrace();

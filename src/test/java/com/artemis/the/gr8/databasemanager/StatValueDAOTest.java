@@ -70,7 +70,7 @@ public class StatValueDAOTest extends TestDatabaseHandler {
                 values.put(subStatistic, Math.abs(random.nextInt(10000))));
 
         Timer timer = Timer.start();
-        database.statValueDAO.updateEntityStatForPlayer(
+        database.statValueDAO.updateStatWithSubStatForPlayer(
                 artemis, testDataProvider.getEntityTypeStatFromSpigot(), values, connection);
         System.out.println("3. Inserted entity-type-stat-values in " + timer.reset() + "ms");
     }
