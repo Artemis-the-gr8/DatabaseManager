@@ -43,8 +43,9 @@ public class SubStatDAO {
         int id = 0;
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(sqlQueries.selectIdFromName(subStatName));
-            resultSet.next();
-            id = resultSet.getInt(1);
+            if (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
             resultSet.close();
         }
         catch (SQLException e) {

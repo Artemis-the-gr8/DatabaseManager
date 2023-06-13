@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * Responsible for all connections with databases
  */
-public class Database {
+public class Database implements DatabaseManager {
 
     private final String URL;
     private final String USER;

@@ -11,10 +11,22 @@ public abstract class StatValueTableQueries {
 
     public abstract @NotNull String createTable();
 
-    public @NotNull String insert() {
+    public @NotNull String insert(int playerId) {
         return "INSERT INTO " + TABLE_NAME + " (" +
                 PLAYER_ID_COLUMN + ", " +
                 STAT_COMBINATION_ID_COLUMN + ", " +
-                VALUE_COLUMN + ") VALUES (?, ?, ?);";
+                VALUE_COLUMN + ") VALUES (" + playerId + ", ?, ?);";
+    }
+
+    public @NotNull String selectAllEntryIds(int playerId) {
+        return "SELECT " + STAT_COMBINATION_ID_COLUMN + " FROM " + TABLE_NAME +
+                " WHERE " + PLAYER_ID_COLUMN + " = " + playerId + ";";
+    }
+
+    public @NotNull String updateForPlayer(int playerId) {
+        return "UPDATE " + TABLE_NAME +
+                " SET " + VALUE_COLUMN + " = ?" +
+                " WHERE " + PLAYER_ID_COLUMN + " = " + playerId +
+                " AND " + STAT_COMBINATION_ID_COLUMN + " = ?;";
     }
 }

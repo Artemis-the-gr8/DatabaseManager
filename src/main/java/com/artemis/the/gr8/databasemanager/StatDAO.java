@@ -42,8 +42,9 @@ public class StatDAO {
         int id = 0;
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(sqlQueries.selectIdFromName(statName));
-            resultSet.next();
-            id = resultSet.getInt(1);
+            if (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
             resultSet.close();
         }
         catch (SQLException e) {

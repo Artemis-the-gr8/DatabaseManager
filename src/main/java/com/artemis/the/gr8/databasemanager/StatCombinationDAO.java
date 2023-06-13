@@ -50,10 +50,14 @@ public class StatCombinationDAO {
         int statId = statDAO.getStatisticID(statistic.name(), connection);
         int subStatId = subStatistic == null ? 0 : subStatDAO.getSubStatId(subStatistic.name(), connection);
         int statCombinationId = 0;
+
         try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sqlQueries.selectIdFromStatAndSubStatId(statId, subStatId));
-            resultSet.next();
-            statCombinationId = resultSet.getInt(1);
+            ResultSet resultSet =
+                    statement.executeQuery(
+                            sqlQueries.selectIdFromStatAndSubStatId(statId, subStatId));
+            if (resultSet.next()) {
+                statCombinationId = resultSet.getInt(1);
+            }
             resultSet.close();
         }
         catch (SQLException e) {

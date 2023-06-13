@@ -27,6 +27,10 @@ public class PlayerDAO {
         }
     }
 
+    public void insert(MyPlayer player, Connection connection) {
+        update(List.of(player), connection);
+    }
+
     public void update(List<MyPlayer> players, Connection connection) {
         if (players != null) {
             List<UUID> currentlyStored = getAllPlayers(connection)
@@ -54,8 +58,9 @@ public class PlayerDAO {
         int id = 0;
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(sqlQueries.selectIdFromUUID(uuid));
-            resultSet.next();
-            id = resultSet.getInt(1);
+            if (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
             resultSet.close();
         }
         catch (SQLException e) {
@@ -70,11 +75,12 @@ public class PlayerDAO {
             ResultSet resultSet = statement.executeQuery(
                     sqlQueries.selectPlayerFromUUID(uuid));
 
-            resultSet.next();
-            player = new MyPlayer(
-                    resultSet.getString(sqlQueries.NAME_COLUMN),
-                    uuid,
-                    resultSet.getBoolean(sqlQueries.IS_EXCLUDED_COLUMN));
+            if (resultSet.next()) {
+                player = new MyPlayer(
+                        resultSet.getString(sqlQueries.NAME_COLUMN),
+                        uuid,
+                        resultSet.getBoolean(sqlQueries.IS_EXCLUDED_COLUMN));
+            }
 
             resultSet.close();
         }
