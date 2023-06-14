@@ -39,7 +39,8 @@ public class SubStatDAO {
         }
     }
 
-    public int getSubStatId(@NotNull MySubStatistic subStatistic, @NotNull Connection connection) {
+    public int getOrGenerateSubStatId(@NotNull MySubStatistic subStatistic, @NotNull Connection connection) {
+        //TODO the generate part
         int id = 0;
         try (Statement statement = connection.createStatement()) {
             String query = switch (subStatistic.type()) {

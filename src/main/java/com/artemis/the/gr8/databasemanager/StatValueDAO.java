@@ -37,7 +37,11 @@ public class StatValueDAO {
         HashMap<Integer, Integer> valuesToUpdate = new HashMap<>();
 
         values.forEach((stat, value) -> {
-            int combinationId = statCombinationDAO.getStatCombinationID(stat, null, connection);
+            int combinationId = statCombinationDAO.getOrGenerateCombinationId(stat, null, connection);
+            if (combinationId == 0) {
+
+            }
+
             if (!currentlyStored.contains(combinationId)) {
                 valuesToInsert.put(combinationId, value);
             } else {
@@ -56,7 +60,7 @@ public class StatValueDAO {
         HashMap<Integer, Integer> valuesToUpdate = new HashMap<>();
 
         values.forEach((subStat, value) -> {
-                int combinationId = statCombinationDAO.getStatCombinationID(statistic, subStat, connection);
+                int combinationId = statCombinationDAO.getOrGenerateCombinationId(statistic, subStat, connection);
                 if (!currentlyStored.contains(combinationId)) {
                     valuesToInsert.put(combinationId, value);
                 } else {

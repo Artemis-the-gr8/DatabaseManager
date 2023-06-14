@@ -38,17 +38,11 @@ public class StatDAO {
         }
     }
 
-    public int getStatisticID(String statName, @NotNull Connection connection) {
-        int id = 0;
-        try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sqlQueries.selectIdFromName(statName));
-            if (resultSet.next()) {
-                id = resultSet.getInt(1);
-            }
-            resultSet.close();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
+    public int getOrGenerateStatisticID(@NotNull MyStatistic statistic, @NotNull Connection connection) {
+        int id = getStatisticID(statistic.name(), connection);
+        if (id == 0) {
+            insert(List.of(statistic), connection);
+            id = getStatisticID(statistic.name(), connection);
         }
         return id;
     }
@@ -85,6 +79,21 @@ public class StatDAO {
             e.printStackTrace();
         }
         return allStats;
+    }
+
+    private int getStatisticID(@NotNull String statName, @NotNull Connection connection) {
+        int id = 0;
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sqlQueries.selectIdFromName(statName));
+            if (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
+            resultSet.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
     }
 
     private void insert(@NotNull List<MyStatistic> statistics, @NotNull Connection connection) {

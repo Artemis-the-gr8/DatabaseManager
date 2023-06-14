@@ -32,6 +32,7 @@ public class StatCombinationDAO {
         }
     }
 
+
     public void update(@NotNull Connection connection) {
         ArrayList<int[]> combinations = getAllValidCombinations(connection);
         ArrayList<int[]> currentlyStored = getCurrentContentsOfCombinationTable(connection);
@@ -46,9 +47,9 @@ public class StatCombinationDAO {
         insert(newValues, connection);
     }
 
-    public int getStatCombinationID(@NotNull MyStatistic statistic, MySubStatistic subStatistic, Connection connection) {
-        int statId = statDAO.getStatisticID(statistic.name(), connection);
-        int subStatId = subStatistic == null ? 0 : subStatDAO.getSubStatId(subStatistic, connection);
+    public int getOrGenerateCombinationId(@NotNull MyStatistic statistic, MySubStatistic subStatistic, @NotNull Connection connection) {
+        int statId = statDAO.getOrGenerateStatisticID(statistic, connection);
+        int subStatId = subStatistic == null ? 0 : subStatDAO.getOrGenerateSubStatId(subStatistic, connection);
         int statCombinationId = 0;
 
         try (Statement statement = connection.createStatement()) {
@@ -64,6 +65,7 @@ public class StatCombinationDAO {
             e.printStackTrace();
         }
         if (statCombinationId == 0) {
+            //TODO the generate part
             if (subStatistic == null) {
                 System.out.println("Couldn't find combination-id for " + statistic.name() + "!");
             } else {
