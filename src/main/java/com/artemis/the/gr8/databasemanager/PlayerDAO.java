@@ -54,17 +54,11 @@ public class PlayerDAO {
         }
     }
 
-    public int getPlayerID(UUID uuid, @NotNull Connection connection) {
-        int id = 0;
-        try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sqlQueries.selectIdFromUUID(uuid));
-            if (resultSet.next()) {
-                id = resultSet.getInt(1);
-            }
-            resultSet.close();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
+    public int getOrGeneratePlayerID(@NotNull MyPlayer player, @NotNull Connection connection) {
+        int id = getPlayerID(player.uuid(), connection);
+        if (id == 0) {
+            insert(player, connection);
+            id = getPlayerID(player.uuid(), connection);
         }
         return id;
     }
@@ -122,6 +116,21 @@ public class PlayerDAO {
             e.printStackTrace();
         }
         return players;
+    }
+
+    private int getPlayerID(@NotNull UUID uuid, @NotNull Connection connection) {
+        int id = 0;
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sqlQueries.selectIdFromUUID(uuid));
+            if (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
+            resultSet.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
     }
 
     private void updateExisting(@NotNull List<MyPlayer> players, @NotNull Connection connection) {

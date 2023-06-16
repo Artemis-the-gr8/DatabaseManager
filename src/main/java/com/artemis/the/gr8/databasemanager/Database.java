@@ -64,10 +64,22 @@ public class Database implements DatabaseManager {
         }
     }
 
+    /**
+     * Update the value for the statistics in the <code>values</code> HashMap
+     * for this player. Note that this method will create new entries in the
+     * database if the player or statistics are not already stored.
+     */
     @Override
-    public void updateStatsForPlayer(MyPlayer player, @NotNull HashMap<MyStatistic, Integer> values) {
+    public void updateStatsForPlayer(@NotNull MyPlayer player, @NotNull HashMap<MyStatistic, Integer> values) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            statValueDAO.updateStatsForPlayer(player, values, connection);
+            int playerID = playerDAO.getOrGeneratePlayerID(player, connection);
+            HashMap<Integer, Integer> valuesWithID = new HashMap<>();
+
+            values.forEach((stat, value) ->
+                    valuesWithID.put(
+                            statCombinationDAO.getOrGenerateCombinationID(stat, null, connection),
+                            value));
+            statValueDAO.updateStatsForPlayer(playerID, valuesWithID, connection);
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -91,8 +103,15 @@ public class Database implements DatabaseManager {
 
     private void updateStatWithSubStatForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            statValueDAO.updateStatWithSubStatForPlayer(
-                    player, statistic, values, connection);
+            int playerID = playerDAO.getOrGeneratePlayerID(player, connection);
+            HashMap<Integer, Integer> valuesWithID = new HashMap<>();
+
+            values.forEach((subStat, value) ->
+                    valuesWithID.put(
+                            statCombinationDAO.getOrGenerateCombinationID(statistic, subStat, connection),
+                            value));
+
+            statValueDAO.updateStatsForPlayer(playerID, valuesWithID, connection);
         }
         catch (SQLException e) {
             e.printStackTrace();

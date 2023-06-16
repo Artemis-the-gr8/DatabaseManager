@@ -68,7 +68,7 @@ public class StatCombinationDAOTest extends TestDatabaseHandler {
     @Test
     @Order(4)
     void getStatCombinationId() {
-        int id = database.statCombinationDAO.getOrGenerateCombinationId(
+        int id = database.statCombinationDAO.getOrGenerateCombinationID(
                 new MyStatistic("kill_entity", MyStatType.ENTITY),
                 new MySubStatistic("zombie", MyStatType.ENTITY),
                 connection);

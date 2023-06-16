@@ -57,7 +57,7 @@ public class PlayerDAOTest extends TestDatabaseHandler {
         newPlayerList.add(newPlayer);
         database.playerDAO.update(newPlayerList, connection);
 
-        int newlyInsertedPlayerId = database.playerDAO.getPlayerID(newPlayer.uuid(), connection);
+        int newlyInsertedPlayerId = database.playerDAO.getOrGeneratePlayerID(newPlayer, connection);
         System.out.println("3. Inserted new player and confirmed id auto-incremented");
         Assertions.assertEquals(currentTableContents + 1, newlyInsertedPlayerId, "id should have auto-incremented!");
     }

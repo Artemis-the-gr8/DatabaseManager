@@ -1,5 +1,8 @@
 package com.artemis.the.gr8.databasemanager;
 
+import com.artemis.the.gr8.databasemanager.models.MyPlayer;
+import com.artemis.the.gr8.databasemanager.models.MyStatistic;
+import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
 import com.artemis.the.gr8.databasemanager.testutils.TestDataProvider;
 import org.junit.jupiter.api.*;
 
@@ -69,6 +72,14 @@ public class TestDatabaseHandler {
         if (file.exists()) {
             file.delete();
         }
+    }
+
+    protected int insertOrGetPlayerID(MyPlayer player) {
+        return database.playerDAO.getOrGeneratePlayerID(player, connection);
+    }
+
+    protected int insertOrGetStatCombinationID(MyStatistic statistic, MySubStatistic subStatistic) {
+        return database.statCombinationDAO.getOrGenerateCombinationID(statistic, subStatistic, connection);
     }
 
     protected void fillStatTableWithSpigotData() {

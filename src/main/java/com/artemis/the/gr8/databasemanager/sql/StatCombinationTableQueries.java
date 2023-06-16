@@ -17,7 +17,7 @@ public abstract class StatCombinationTableQueries {
                 SUB_STAT_ID_COLUMN + ") VALUES (?, ?);";
     }
 
-    public @NotNull String selectIdFromStatAndSubStatId(int statId, int subStatId) {
+    public @NotNull String selectIDFromStatAndSubStatID(int statId, int subStatId) {
         String subStatCondition = subStatId == 0 ? " IS NULL" : " = " + subStatId;
 
         return "SELECT " + ID_COLUMN + " FROM " + TABLE_NAME +

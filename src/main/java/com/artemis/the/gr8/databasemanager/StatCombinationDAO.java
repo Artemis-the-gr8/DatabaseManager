@@ -9,6 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class StatCombinationDAO {
@@ -47,32 +48,32 @@ public class StatCombinationDAO {
         insert(newValues, connection);
     }
 
-    public int getOrGenerateCombinationId(@NotNull MyStatistic statistic, MySubStatistic subStatistic, @NotNull Connection connection) {
+    public int getOrGenerateCombinationID(@NotNull MyStatistic statistic, MySubStatistic subStatistic, @NotNull Connection connection) {
         int statId = statDAO.getOrGenerateStatisticID(statistic, connection);
-        int subStatId = subStatistic == null ? 0 : subStatDAO.getOrGenerateSubStatId(subStatistic, connection);
-        int statCombinationId = 0;
+        int subStatId = subStatistic == null ? 0 : subStatDAO.getOrGenerateSubStatID(subStatistic, connection);
+        int statCombinationId = getCombinationID(statId, subStatId, connection);
 
+        if (statCombinationId == 0) {
+            insert(new ArrayList<>(List.of(new int[]{statId, subStatId})), connection);
+            statCombinationId = getCombinationID(statId, subStatId, connection);
+        }
+
+        return statCombinationId;
+    }
+
+    private int getCombinationID(int statID, int subStatID, @NotNull Connection connection) {
+        int id = 0;
         try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet =
-                    statement.executeQuery(
-                            sqlQueries.selectIdFromStatAndSubStatId(statId, subStatId));
+            ResultSet resultSet = statement.executeQuery(sqlQueries.selectIDFromStatAndSubStatID(statID, subStatID));
             if (resultSet.next()) {
-                statCombinationId = resultSet.getInt(1);
+                id = resultSet.getInt(1);
             }
             resultSet.close();
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
-        if (statCombinationId == 0) {
-            //TODO the generate part
-            if (subStatistic == null) {
-                System.out.println("Couldn't find combination-id for " + statistic.name() + "!");
-            } else {
-                System.out.println("Couldn't find combination-id for " + statistic.name() + " (id: " + statId + ") and " + subStatistic.name() + "(id: " + subStatId + ")!");
-            }
-        }
-        return statCombinationId;
+        return id;
     }
 
     protected int getStatCombinationCount(@NotNull Connection connection) {

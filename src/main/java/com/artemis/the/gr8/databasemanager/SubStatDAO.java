@@ -39,16 +39,28 @@ public class SubStatDAO {
         }
     }
 
-    public int getOrGenerateSubStatId(@NotNull MySubStatistic subStatistic, @NotNull Connection connection) {
-        //TODO the generate part
+    public int getOrGenerateSubStatID(@NotNull MySubStatistic subStatistic, @NotNull Connection connection) {
+        int id = getSubStatID(subStatistic, connection);
+        if (id == 0 && !(subStatistic.type() == MyStatType.CUSTOM)) {
+            insert(List.of(subStatistic), connection);
+            id = getSubStatID(subStatistic, connection);
+        }
+        return id;
+    }
+
+    private int getSubStatID(@NotNull MySubStatistic subStatistic, @NotNull Connection connection) {
         int id = 0;
         try (Statement statement = connection.createStatement()) {
             String query = switch (subStatistic.type()) {
-                case BLOCK -> sqlQueries.selectBlockIdFromName(subStatistic.name());
-                case ITEM -> sqlQueries.selectItemIdFromName(subStatistic.name());
-                case ENTITY -> sqlQueries.selectEntityIdFromName(subStatistic.name());
+                case BLOCK -> sqlQueries.selectBlockIDFromName(subStatistic.name());
+                case ITEM -> sqlQueries.selectItemIDFromName(subStatistic.name());
+                case ENTITY -> sqlQueries.selectEntityIDFromName(subStatistic.name());
                 case CUSTOM -> null;
             };
+            if (query == null) {
+                return 0;
+            }
+
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
                 id = resultSet.getInt(1);

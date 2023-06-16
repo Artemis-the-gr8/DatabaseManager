@@ -30,18 +30,12 @@ public class StatValueDAO {
         }
     }
 
-    public void updateStatsForPlayer(MyPlayer player, @NotNull HashMap<MyStatistic, Integer> values, Connection connection) {
-        int playerID = getPlayerId(player, connection);
+    public void updateStatsForPlayer(int playerID, @NotNull HashMap<Integer, Integer> valuesWithCombinationID, Connection connection) {
         ArrayList<Integer> currentlyStored = getAllEntryIds(playerID, connection);
         HashMap<Integer, Integer> valuesToInsert = new HashMap<>();
         HashMap<Integer, Integer> valuesToUpdate = new HashMap<>();
 
-        values.forEach((stat, value) -> {
-            int combinationId = statCombinationDAO.getOrGenerateCombinationId(stat, null, connection);
-            if (combinationId == 0) {
-
-            }
-
+        valuesWithCombinationID.forEach((combinationId, value) -> {
             if (!currentlyStored.contains(combinationId)) {
                 valuesToInsert.put(combinationId, value);
             } else {
@@ -60,7 +54,7 @@ public class StatValueDAO {
         HashMap<Integer, Integer> valuesToUpdate = new HashMap<>();
 
         values.forEach((subStat, value) -> {
-                int combinationId = statCombinationDAO.getOrGenerateCombinationId(statistic, subStat, connection);
+                int combinationId = statCombinationDAO.getOrGenerateCombinationID(statistic, subStat, connection);
                 if (!currentlyStored.contains(combinationId)) {
                     valuesToInsert.put(combinationId, value);
                 } else {
@@ -73,10 +67,10 @@ public class StatValueDAO {
     }
 
     private int getPlayerId(@NotNull MyPlayer player, Connection connection) {
-        int playerID = playerDAO.getPlayerID(player.uuid(), connection);
+        int playerID = playerDAO.getOrGeneratePlayerID(player, connection);
         if (playerID == 0) {
             playerDAO.insert(player, connection);
-            playerID = playerDAO.getPlayerID(player.uuid(), connection);
+            playerID = playerDAO.getOrGeneratePlayerID(player, connection);
         }
         return playerID;
     }

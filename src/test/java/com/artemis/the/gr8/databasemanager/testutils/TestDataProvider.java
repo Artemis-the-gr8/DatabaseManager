@@ -54,6 +54,10 @@ public class TestDataProvider {
         return new MyStatistic(Statistic.KILL_ENTITY.toString().toLowerCase(Locale.ENGLISH), MyStatType.ENTITY);
     }
 
+    public @NotNull MyStatistic getBlockTypeStatFromSpigot() {
+        return new MyStatistic(Statistic.MINE_BLOCK.toString().toLowerCase(Locale.ENGLISH), MyStatType.BLOCK);
+    }
+
     public @NotNull List<MyPlayer> getSomeFakePlayers() {
         List<MyPlayer> players = new ArrayList<>();
         players.add(getArtemis());
