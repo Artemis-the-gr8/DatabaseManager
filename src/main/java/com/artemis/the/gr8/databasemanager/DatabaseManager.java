@@ -10,6 +10,9 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ The outgoing API
+ */
 public interface DatabaseManager {
 
     @Contract("_, _, _ -> new")
@@ -29,7 +32,9 @@ public interface DatabaseManager {
     void updatePlayers(List<MyPlayer> players);
 
     /** For the given player, update the values in the database
-     * for all provided statistics.
+     * for all provided statistics. The statistic must be of
+     * type CUSTOM (sometimes called UNTYPED).
+     *
      * @param player the player whose statistics should be updated
      * @param values a <code>HashMap</code> with statistic-value pairs
      *               for all statistics that should be updated
@@ -38,38 +43,17 @@ public interface DatabaseManager {
     void updateStatsForPlayer(MyPlayer player, @NotNull HashMap<MyStatistic, Integer> values);
 
     /**
-     * For the given player and the given statistic (of type ENTITY),
-     * update the values in the database for all provided entities.
+     * For the given player and the given statistic, update the
+     * values in the database for all provided sub-statistics.
+     * This method is only for statistics that have a sub-statistic,
+     * so statistics of type ENTITY, BLOCK or ITEM.
+     *
      * @param player the player whose statistics should be updated
-     * @param statistic a statistic of type ENTITY
+     * @param statistic a statistic of type ENTITY, BLOCK or ITEM
      *                       (for example "kill_entity")
      * @param values a <code>HashMap</code> with substatistic-value pairs for all
      *               substatistics that should be updated
      *               (for example "zombie, 15")
      */
-    void updateEntityStatForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values);
-
-    /**
-     * For the given player and the given statistic (of type ITEM),
-     * update the values in the database for all provided items.
-     * @param player the player whose statistics should be updated
-     * @param statistic a statistic of type ITEM
-     *                       (for example "craft_item")
-     * @param values a <code>HashMap</code> with substatistic-value pairs for all
-     *               substatistics that should be updated
-     *               (for example "birch_boat, 15")
-     */
-    void updateItemStatForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values);
-
-    /**
-     * For the given player and the given statistic (of type BLOCK),
-     * update the values in the database for all provided blocks.
-     * @param player the player whose statistics should be updated
-     * @param statistic a statistic of type BLOCK
-     *                       (for example "mine_block")
-     * @param values a <code>HashMap</code> with substatistic-value pairs for all
-     *               substatistics that should be updated
-     *               (for example "stone, 15")
-     */
-    void updateBlockStatForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values);
+    void updateStatWithSubStatsForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values);
 }

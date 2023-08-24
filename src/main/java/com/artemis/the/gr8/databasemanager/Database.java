@@ -87,21 +87,7 @@ public class Database implements DatabaseManager {
     }
 
     @Override
-    public void updateEntityStatForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values) {
-        updateStatWithSubStatForPlayer(player, statistic, values);
-    }
-
-    @Override
-    public void updateItemStatForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values) {
-        updateStatWithSubStatForPlayer(player, statistic, values);
-    }
-
-    @Override
-    public void updateBlockStatForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values) {
-        updateStatWithSubStatForPlayer(player, statistic, values);
-    }
-
-    private void updateStatWithSubStatForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values) {
+    public void updateStatWithSubStatsForPlayer(MyPlayer player, @NotNull MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             int playerID = playerDAO.getOrGeneratePlayerID(player, connection);
             HashMap<Integer, Integer> valuesWithID = new HashMap<>();
@@ -123,7 +109,7 @@ public class Database implements DatabaseManager {
         statDAO = new StatDAO(new MySQLStatTableQueries());
         subStatDAO = new SubStatDAO(new MySQLSubStatTableQueries());
         statCombinationDAO = new StatCombinationDAO(statDAO, subStatDAO, new MySQLStatCombinationTableQueries());
-        statValueDAO = new StatValueDAO(playerDAO, statCombinationDAO, new MySQLStatValueTableQueries());
+        statValueDAO = new StatValueDAO(new MySQLStatValueTableQueries());
 
         createTablesIfNotExisting();
     }
@@ -133,7 +119,7 @@ public class Database implements DatabaseManager {
         statDAO = new StatDAO(new SQLiteStatTableQueries());
         subStatDAO = new SubStatDAO(new SQLiteSubStatTableQueries());
         statCombinationDAO = new StatCombinationDAO(statDAO, subStatDAO, new SQLiteStatCombinationTableQueries());
-        statValueDAO = new StatValueDAO(playerDAO, statCombinationDAO, new SQLiteStatValueTableQueries());
+        statValueDAO = new StatValueDAO(new SQLiteStatValueTableQueries());
 
         createTablesIfNotExisting();
     }

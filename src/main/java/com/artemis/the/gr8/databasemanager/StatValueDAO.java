@@ -1,8 +1,5 @@
 package com.artemis.the.gr8.databasemanager;
 
-import com.artemis.the.gr8.databasemanager.models.MyPlayer;
-import com.artemis.the.gr8.databasemanager.models.MyStatistic;
-import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
 import com.artemis.the.gr8.databasemanager.sql.StatValueTableQueries;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,13 +8,9 @@ import java.util.*;
 
 public class StatValueDAO {
 
-    private final PlayerDAO playerDAO;
-    private final StatCombinationDAO statCombinationDAO;
     private final StatValueTableQueries sqlQueries;
 
-    public StatValueDAO(PlayerDAO playerDAO, StatCombinationDAO statCombinationDAO, StatValueTableQueries statValueTableQueries) {
-        this.playerDAO = playerDAO;
-        this.statCombinationDAO = statCombinationDAO;
+    public StatValueDAO(StatValueTableQueries statValueTableQueries) {
         sqlQueries = statValueTableQueries;
     }
 
@@ -45,34 +38,6 @@ public class StatValueDAO {
 
         insert(playerID, valuesToInsert, connection);
         update(playerID, valuesToUpdate, connection);
-    }
-
-    public void updateStatWithSubStatForPlayer(MyPlayer player, MyStatistic statistic, @NotNull HashMap<MySubStatistic, Integer> values, Connection connection) {
-        int playerID = getPlayerId(player, connection);
-        ArrayList<Integer> currentlyStored = getAllEntryIds(playerID, connection);
-        HashMap<Integer, Integer> valuesToInsert = new HashMap<>();
-        HashMap<Integer, Integer> valuesToUpdate = new HashMap<>();
-
-        values.forEach((subStat, value) -> {
-                int combinationId = statCombinationDAO.getOrGenerateCombinationID(statistic, subStat, connection);
-                if (!currentlyStored.contains(combinationId)) {
-                    valuesToInsert.put(combinationId, value);
-                } else {
-                    valuesToUpdate.put(combinationId, value);
-                }
-        });
-
-        insert(playerID, valuesToInsert, connection);
-        update(playerID, valuesToUpdate, connection);
-    }
-
-    private int getPlayerId(@NotNull MyPlayer player, Connection connection) {
-        int playerID = playerDAO.getOrGeneratePlayerID(player, connection);
-        if (playerID == 0) {
-            playerDAO.insert(player, connection);
-            playerID = playerDAO.getOrGeneratePlayerID(player, connection);
-        }
-        return playerID;
     }
 
     private @NotNull ArrayList<Integer> getAllEntryIds(int playerId, @NotNull Connection connection) {
