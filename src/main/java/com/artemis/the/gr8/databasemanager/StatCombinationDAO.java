@@ -49,22 +49,22 @@ public class StatCombinationDAO {
     }
 
     public int getOrGenerateCombinationID(@NotNull MyStatistic statistic, MySubStatistic subStatistic, @NotNull Connection connection) {
-        int statId = statDAO.getOrGenerateStatisticID(statistic, connection);
-        int subStatId = subStatistic == null ? 0 : subStatDAO.getOrGenerateSubStatID(subStatistic, connection);
-        int statCombinationId = getCombinationID(statId, subStatId, connection);
+        int id = getCombinationID(statistic, subStatistic, connection);
+        if (id == 0) {
+            int statID = statDAO.getOrGenerateStatisticID(statistic, connection);
+            int subStatID = subStatistic == null ? 0 : subStatDAO.getOrGenerateSubStatID(subStatistic, connection);
 
-        if (statCombinationId == 0) {
-            insert(new ArrayList<>(List.of(new int[]{statId, subStatId})), connection);
-            statCombinationId = getCombinationID(statId, subStatId, connection);
+            insert(new ArrayList<>(List.of(new int[]{statID, subStatID})), connection);
+            id = getCombinationID(statistic, subStatistic, connection);
         }
-
-        return statCombinationId;
+        return id;
     }
 
-    private int getCombinationID(int statID, int subStatID, @NotNull Connection connection) {
+    private int getCombinationID(@NotNull MyStatistic statistic, MySubStatistic subStatistic, @NotNull Connection connection) {
+        String subStatName = subStatistic == null ? null : subStatistic.name();
         int id = 0;
         try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sqlQueries.selectIDFromStatAndSubStatID(statID, subStatID));
+            ResultSet resultSet = statement.executeQuery(sqlQueries.selectID(statistic.name(), subStatName, statistic.type()));
             if (resultSet.next()) {
                 id = resultSet.getInt(1);
             }

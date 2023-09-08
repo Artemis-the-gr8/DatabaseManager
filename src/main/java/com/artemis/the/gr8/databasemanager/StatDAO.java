@@ -68,10 +68,10 @@ public class StatDAO {
 
             while (resultSet.next()) {
                 allStats.put(
-                        resultSet.getInt(sqlQueries.ID_COLUMN),
+                        resultSet.getInt(StatTableQueries.ID_COLUMN),
                         new MyStatistic(
-                                resultSet.getString(sqlQueries.NAME_COLUMN),
-                                MyStatType.fromString(resultSet.getString(sqlQueries.TYPE_COLUMN))));
+                                resultSet.getString(StatTableQueries.NAME_COLUMN),
+                                MyStatType.fromString(resultSet.getString(StatTableQueries.TYPE_COLUMN))));
             }
             resultSet.close();
         }

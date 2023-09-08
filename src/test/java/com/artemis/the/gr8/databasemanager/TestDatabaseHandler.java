@@ -11,7 +11,7 @@ import java.sql.*;
 
 public class TestDatabaseHandler {
 
-    protected static final boolean useSQLite = true;
+    protected static final boolean useSQLite = false;
 
     private static String URL;
     private static String USERNAME;

@@ -7,9 +7,13 @@ import org.jetbrains.annotations.NotNull;
 public abstract class SubStatTableQueries {
 
     public static final String TABLE_NAME = "sub_statistics";
-    public final String ID_COLUMN = "id";
-    public final String NAME_COLUMN = "name";
-    public final String TYPE_COLUMN = "type";
+    public static final String ID_COLUMN = "id";
+    public static final String NAME_COLUMN = "name";
+    public static final String TYPE_COLUMN = "type";
+
+    public static final String ID_COLUMN_WITH_TABLE_NAME = TABLE_NAME + "." + ID_COLUMN;
+    public static final String NAME_COLUMN_WITH_TABLE_NAME = TABLE_NAME + "." + NAME_COLUMN;
+    public static final String TYPE_COLUMN_WITH_TABLE_NAME = TABLE_NAME + "." + TYPE_COLUMN;
 
     public abstract @NotNull String createTable();
 
