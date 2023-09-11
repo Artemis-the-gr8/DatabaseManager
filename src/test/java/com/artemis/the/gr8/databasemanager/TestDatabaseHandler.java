@@ -12,6 +12,7 @@ import java.sql.*;
 public class TestDatabaseHandler {
 
     protected static final boolean useSQLite = false;
+    protected static final boolean useSpigot = false;
 
     private static String URL;
     private static String USERNAME;
@@ -83,7 +84,7 @@ public class TestDatabaseHandler {
     }
 
     protected void fillStatTableWithSpigotData() {
-        database.statDAO.update(testDataProvider.getAllStatsFromSpigot(), connection);
+        database.statDAO.update(testDataProvider.getAllStatsFromSpigot().stream().toList(), connection);
     }
 
     protected void fillSubStatTableWithSpigotData() {

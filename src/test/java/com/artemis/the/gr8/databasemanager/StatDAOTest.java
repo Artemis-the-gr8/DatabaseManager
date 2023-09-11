@@ -5,6 +5,7 @@ import com.artemis.the.gr8.databasemanager.utils.Timer;
 import org.junit.jupiter.api.*;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,13 +14,16 @@ public class StatDAOTest extends TestDatabaseHandler {
 
     @Test
     @Order(1)
-    void retrieveTestDataFromSpigot() {
+    void retrieveTestData() {
         Timer timer = Timer.start();
-        List<MyStatistic> stats = testDataProvider.getAllStatsFromSpigot();
-        assertFalse(stats.isEmpty(),
-                "no stats were retrieved from Spigot!");
+        Set<MyStatistic> stats = useSpigot ?
+                testDataProvider.getAllStatsFromSpigot() :
+                testDataProvider.getStatsFromTestFiles();
 
-        System.out.println("1. Got " + stats.size() + " stats from Spigot in " + timer.reset() + "ms");
+        assertFalse(stats.isEmpty(),
+                "no stats were retrieved!");
+
+        System.out.println("1. Got " + stats.size() + " stats in " + timer.reset() + "ms");
     }
 
     @Test
@@ -35,12 +39,12 @@ public class StatDAOTest extends TestDatabaseHandler {
     @Test
     @Order(3)
     void insertSpigotData() {
-        List<MyStatistic> stats = testDataProvider.getAllStatsFromSpigot();
+        Set<MyStatistic> stats = testDataProvider.getAllStatsFromSpigot();
 
         Timer timer = Timer.start();
         int before = database.statDAO.getStatisticCount(connection);
 
-        database.statDAO.update(stats, connection);
+        database.statDAO.update(stats.stream().toList(), connection);
 
         int expectedCount = stats.size();
         int actualCount = database.statDAO.getStatisticCount(connection);

@@ -73,6 +73,13 @@
         </dependency>
 
         <dependency>
+            <groupId>com.artemis.the.gr8</groupId>
+            <artifactId>StatFileReader</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>24.0.1</version>

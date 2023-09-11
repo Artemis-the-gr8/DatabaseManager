@@ -4,6 +4,7 @@ import com.artemis.the.gr8.databasemanager.models.MyStatType;
 import com.artemis.the.gr8.databasemanager.models.MyStatistic;
 import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
 import com.artemis.the.gr8.databasemanager.utils.Timer;
+import com.artemis.the.gr8.statfilereader.model.Stats;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -12,49 +13,37 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StatValueDAOTest extends TestDatabaseHandler {
 
     @Test
     @Order(1)
-    void insertSomeValues() {
-        Random randomizer = new Random();
-        HashMap<Integer, Integer> values = new HashMap<>();
-        int playerID = super.insertOrGetPlayerID(testDataProvider.getArtemis());
-//        super.fillStatTableWithSpigotData();
-
-        List<MyStatistic> fakeStats = testDataProvider.getAllStatsFromSpigot();
-        for (int i = 0; i <5; i++) {
-            if (fakeStats.get(i).type() == MyStatType.CUSTOM) {
-                values.put(
-                        super.insertOrGetStatCombinationID(fakeStats.get(i), null),
-                        Math.abs(randomizer.nextInt(1000)));
-            }
-        }
-
-        Timer timer = Timer.start();
-        database.statValueDAO.updateStatsForPlayer(playerID, values, connection);
-        System.out.println("1. Inserted some fake values in " + timer.reset() + "ms");
-    }
-
-    @Test
-    @Order(2)
     void insertValuesForAllCustomTypeStats() {
         Random randomizer = new Random();
         HashMap<Integer, Integer> values = new HashMap<>();
         int playerID = super.insertOrGetPlayerID(testDataProvider.getArtemis());
 
-        List<MyStatistic> fakeStats = testDataProvider.getAllStatsFromSpigot();
-        fakeStats.forEach(statistic -> {
-            if (statistic.type() == MyStatType.CUSTOM) {
-                values.put(
-                        super.insertOrGetStatCombinationID(
-                                statistic,
-                                null),
-                        Math.abs(randomizer.nextInt(1000)));
-            }
-        });
+        Set<MyStatistic> fakeStats;
+        if (useSpigot) {
+            fakeStats = testDataProvider.getAllStatsFromSpigot();
+            fakeStats.stream()
+                    .filter(statistic -> statistic.type() == MyStatType.CUSTOM)
+                    .forEach(statistic -> values.put(
+                            super.insertOrGetStatCombinationID(statistic, null),
+                            Math.abs(randomizer.nextInt(1000))));
+        }
+        else {
+            fakeStats = testDataProvider.getStatsFromTestFiles();
+            Stats fakeData = testDataProvider.getValuesForArtemisFromFile();
+            fakeStats.stream()
+                    .filter(statistic -> statistic.type() == MyStatType.CUSTOM)
+                    .forEach(statistic -> values.put(
+                            super.insertOrGetStatCombinationID(statistic, null),
+                            fakeData.custom.get(statistic.name())
+                    ));
+        }
 
         Timer timer = Timer.start();
         database.statValueDAO.updateStatsForPlayer(playerID, values, connection);
@@ -62,7 +51,7 @@ public class StatValueDAOTest extends TestDatabaseHandler {
     }
 
     @Test
-    @Order(3)
+    @Order(2)
     void insertValuesForTypeEntity() {
         Random random = new Random();
         int playerID = super.insertOrGetPlayerID(testDataProvider.getArtemis());
@@ -85,7 +74,7 @@ public class StatValueDAOTest extends TestDatabaseHandler {
     }
 
     @Test
-    @Order(4)
+    @Order(3)
     void insertWrongValuesForTypeBlock() {
         Random random = new Random();
         int playerID = super.insertOrGetPlayerID(testDataProvider.getArtemis());

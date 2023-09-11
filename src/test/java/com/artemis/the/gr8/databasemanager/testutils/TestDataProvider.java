@@ -4,21 +4,66 @@ import com.artemis.the.gr8.databasemanager.models.MyPlayer;
 import com.artemis.the.gr8.databasemanager.models.MyStatType;
 import com.artemis.the.gr8.databasemanager.models.MyStatistic;
 import com.artemis.the.gr8.databasemanager.models.MySubStatistic;
+import com.artemis.the.gr8.statfilereader.StatFileReader;
+import com.artemis.the.gr8.statfilereader.model.Stats;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TestDataProvider {
 
-    public @NotNull List<MyStatistic> getAllStatsFromSpigot() {
+    private static final String testFolderPath = "src/test/resources/stats";
+
+    public @NotNull Set<MyStatistic> getAllStatsFromSpigot() {
         return Arrays.stream(Statistic.values())
                 .map(statistic -> new MyStatistic(
                         statistic.toString().toLowerCase(Locale.ENGLISH),
                         MyStatType.fromString(statistic.getType().toString())))
-                .toList();
+                .collect(Collectors.toSet());
+    }
+
+    public Set<MyStatistic> getStatsFromTestFiles() throws NullPointerException {
+        File statFolder = new File(testFolderPath);
+        File[] statFiles = statFolder.listFiles();
+        if (statFiles == null) {
+            throw new NullPointerException("No test files found!");
+        }
+
+        StatFileReader reader = new StatFileReader();
+        List<Stats> statFileContents = new ArrayList<>();
+        Arrays.stream(statFiles).forEach(file ->
+                statFileContents.add(reader.readFile(file.getPath())));
+
+        Set<MyStatistic> statistics = getNonCustomStats();
+        statFileContents.forEach(fileContent ->
+                fileContent.custom.keySet().forEach(key ->
+                        statistics.add(new MyStatistic(key, MyStatType.CUSTOM))));
+
+        return statistics;
+    }
+
+    public Stats getValuesForArtemisFromFile() {
+        String artemisFilePath = testFolderPath + File.separator + getArtemis().uuid().toString() + ".json";
+        StatFileReader reader = new StatFileReader();
+        return reader.readFile(artemisFilePath);
+    }
+
+    private Set<MyStatistic> getNonCustomStats() {
+        Set<MyStatistic> statistics = new HashSet<>();
+        statistics.add(new MyStatistic("mined", MyStatType.BLOCK));
+        statistics.add(new MyStatistic("broken", MyStatType.ITEM));
+        statistics.add(new MyStatistic("crafted", MyStatType.ITEM));
+        statistics.add(new MyStatistic("used", MyStatType.ITEM));
+        statistics.add(new MyStatistic("picked_up", MyStatType.ITEM));
+        statistics.add(new MyStatistic("dropped", MyStatType.ITEM));
+        statistics.add(new MyStatistic("killed", MyStatType.ENTITY));
+        statistics.add(new MyStatistic("killed_by", MyStatType.ENTITY));
+        return statistics;
     }
 
     public @NotNull List<MyStatistic> getSomeFakeStats() {
