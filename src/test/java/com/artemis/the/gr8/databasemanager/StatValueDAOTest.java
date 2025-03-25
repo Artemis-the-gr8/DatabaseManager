@@ -47,7 +47,7 @@ public class StatValueDAOTest extends TestDatabaseHandler {
 
         Timer timer = Timer.start();
         database.statValueDAO.updateStatsForPlayer(playerID, values, connection);
-        System.out.println("2. Inserted data for all CUSTOM stats in " + timer.reset() + "ms");
+        System.out.println("1. Inserted data for all CUSTOM stats in " + timer.reset() + "ms");
     }
 
     @Test
@@ -70,7 +70,7 @@ public class StatValueDAOTest extends TestDatabaseHandler {
 
         Timer timer = Timer.start();
         database.statValueDAO.updateStatsForPlayer(playerID, values, connection);
-        System.out.println("3. Inserted entity-type-stat-values in " + timer.reset() + "ms");
+        System.out.println("2. Inserted entity-type-stat-values in " + timer.reset() + "ms");
     }
 
     @Test
@@ -93,6 +93,6 @@ public class StatValueDAOTest extends TestDatabaseHandler {
 
         Timer timer = Timer.start();
         database.statValueDAO.updateStatsForPlayer(playerID, values, connection);
-        System.out.println("4. Inserted entity-type-stat-values for block-type-stat in " + timer.reset() + "ms");
+        System.out.println("3. Inserted entity-type-stat-values for block-type-stat in " + timer.reset() + "ms");
     }
 }

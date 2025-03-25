@@ -38,7 +38,7 @@ public interface DatabaseManager {
      * @param player the player whose statistics should be updated
      * @param values a <code>HashMap</code> with statistic-value pairs
      *               for all statistics that should be updated
-     *               (for example "animals_bred, 20)
+     *               (for example "animals_bred, 20")
      */
     void updateStatsForPlayer(MyPlayer player, @NotNull HashMap<MyStatistic, Integer> values);
 
